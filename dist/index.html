@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="id" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cff'/%3E%3Cstop offset='.5' stop-color='%2300b8d9'/%3E%3Cstop offset='1' stop-color='%23e6499a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='url(%23g)'/%3E%3Cpath d='M16 7.6 18.3 13.7 24.4 16 18.3 18.3 16 24.4 13.7 18.3 7.6 16 13.7 13.7Z' fill='%23fff'/%3E%3C/svg%3E"
+    />
+    <title>TaSkill — Student Task &amp; Exam Manager</title>
+    <script>
+      // Applied before first paint so the page never flashes the wrong theme.
+      (function () {
+        try {
+          var stored = localStorage.getItem('student-tasks:theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.dataset.theme =
+            stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light';
+        } catch (error) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/TaSkill/assets/index-CB4ZH_lt.js"></script>
+    <link rel="stylesheet" crossorigin href="/TaSkill/assets/index-8exbF32T.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
