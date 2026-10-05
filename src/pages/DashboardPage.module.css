@@ -1,0 +1,60 @@
+/* Hero: the one place on the page allowed an iridescent surface. The heading
+   text sits on a near-white / near-black base so it never competes with the
+   gradient behind it. */
+.hero {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 1.1rem 1.25rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background:
+    var(--sheen),
+    linear-gradient(180deg, var(--accent-soft) 0%, rgb(0 0 0 / 0) 60%),
+    var(--surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* Iridescent hairline along the top edge: the accent at a width that cannot
+   reduce the contrast of anything sitting on the panel. */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--holo-grad);
+}
+
+.heading {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.subheading {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+  max-width: 34rem;
+}
+
+.skeletonStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+@media (max-width: 34rem) {
+  .hero {
+    padding: 0.9rem 1rem;
+  }
+
+  .heading {
+    font-size: 1.2rem;
+  }
+}

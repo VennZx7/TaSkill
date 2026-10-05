@@ -1,0 +1,52 @@
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 8rem;
+  gap: 0.7rem;
+}
+
+.formError {
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-text);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.8125rem;
+}
+
+.notice {
+  background: var(--warning-soft);
+  border: 1px solid var(--warning-border);
+  color: var(--warning-text);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.8125rem;
+}
+
+/* Two stacked skeleton bars mirror the height of the replaced form, so the
+   modal does not jump when generation starts. */
+.pending {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.pendingBar {
+  height: 3rem;
+}
+
+.pendingNote {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 32rem) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

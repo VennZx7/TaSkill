@@ -1,0 +1,98 @@
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  text-align: center;
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 3rem 1.5rem;
+  color: var(--text-muted);
+}
+
+/* Glossy orb holding the state icon. */
+.iconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.75rem;
+  height: 3.75rem;
+  margin-bottom: 0.35rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 26%, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0) 52%),
+    var(--chrome);
+  border: 1px solid var(--border-strong);
+  box-shadow:
+    inset 0 2px 4px rgb(255 255 255 / 40%),
+    inset 0 -3px 8px rgb(0 0 0 / 10%),
+    var(--shadow-md);
+  color: var(--text-muted);
+}
+
+.iconError {
+  background:
+    radial-gradient(circle at 32% 26%, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0) 52%),
+    var(--danger-soft);
+  border-color: var(--danger-border);
+  box-shadow:
+    inset 0 2px 4px rgb(255 255 255 / 40%),
+    inset 0 -3px 8px rgb(0 0 0 / 10%),
+    var(--shadow-md);
+  color: var(--danger);
+}
+
+.heading {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.body {
+  font-size: 0.8125rem;
+  max-width: 26rem;
+}
+
+.errorState {
+  border-style: solid;
+  border-color: var(--danger-border);
+  background: var(--danger-soft);
+}
+
+.errorState .heading {
+  color: var(--danger-text);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.skeleton {
+  height: 11.5rem;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--surface-muted) 25%, var(--border) 50%, var(--surface-muted) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

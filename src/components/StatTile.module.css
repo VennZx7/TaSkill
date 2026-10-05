@@ -1,0 +1,82 @@
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.9rem 1rem;
+  background:
+    var(--sheen),
+    linear-gradient(180deg, var(--accent-soft) 0%, rgb(0 0 0 / 0) 55%),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+  overflow: hidden;
+  transition:
+    box-shadow 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+
+/* Elevation plus a chrome edge — the "metallic shine" the brand is built on. A
+   hue shift here would fight the semantic accent colours, so the hover stays in
+   the neutral family and the chroma lives in the edges. */
+.tile:hover {
+  transform: translateY(-1px);
+  border-color: var(--holo-ring);
+  box-shadow:
+    var(--shadow-md),
+    0 0 1.1rem var(--holo-glow-soft);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 0.4rem;
+  border-radius: var(--radius-sm);
+  background: var(--chrome);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  transition: border-color 0.2s var(--ease);
+}
+
+.tile:hover .icon {
+  border-color: var(--holo-ring);
+}
+
+.accent .icon {
+  background: var(--accent-grad);
+  border-color: transparent;
+  color: var(--primary-label);
+}
+
+.value {
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  /* Chromium default font has no tabular figure set, so the gradient is clipped
+     per glyph and would shimmer on hover without this. */
+  background: var(--brand-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: var(--text-subtle);
+  overflow-wrap: anywhere;
+}

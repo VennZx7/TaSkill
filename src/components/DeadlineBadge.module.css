@@ -1,0 +1,11 @@
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.remaining {
+  font-size: 0.75rem;
+  color: var(--text-subtle);
+}

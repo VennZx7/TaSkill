@@ -1,0 +1,26 @@
+.row {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.item {
+  flex: 1 1 10rem;
+  min-width: 10rem;
+}
+
+.searchItem {
+  flex: 2 1 15rem;
+}
+
+.count {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  align-self: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}

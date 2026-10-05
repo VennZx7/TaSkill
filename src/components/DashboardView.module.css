@@ -1,0 +1,219 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background:
+    var(--sheen),
+    linear-gradient(180deg, var(--accent-soft) 0%, rgb(0 0 0 / 0) 45%),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  /* One tinted hairline on top instead of a box shadow; --accent is set inline
+     per panel and inherits down to the row rails. */
+  border-top: 2px solid var(--accent, var(--border-strong));
+  padding: 0.9rem 1rem 0.85rem;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition:
+    box-shadow 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+
+/* Elevation plus an iridescent edge. The panel tints its own top rail in the
+   semantic colour, so the hover adds metal to the other three edges instead of
+   recolouring the rail — a meaning must not change on hover. */
+.panel:hover {
+  transform: translateY(-1px);
+  border-right-color: var(--holo-ring);
+  border-bottom-color: var(--holo-ring);
+  border-left-color: var(--holo-ring);
+  box-shadow:
+    var(--shadow-md),
+    0 0 1.1rem var(--holo-glow-soft);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.count {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 650;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+/* An alert count keeps the danger hue: it is a meaning, not decoration. */
+.countAlert {
+  color: var(--danger-text);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.rail {
+  width: 3px;
+  align-self: stretch;
+  min-height: 1.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent, var(--rail-default));
+  flex-shrink: 0;
+}
+
+.rowBody {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.rowTitle {
+  font-size: 0.8125rem;
+  font-weight: 550;
+  line-height: 1.35;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowMeta {
+  font-size: 0.75rem;
+  color: var(--text-subtle);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  padding: 1.1rem 0.25rem 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--text-subtle);
+  text-align: center;
+}
+
+.quickActions {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background:
+    var(--sheen),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* The only action group on the page, so it carries the iridescent edge that the
+   passive panels keep for their hover. */
+.quickActions::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--holo-grad);
+}
+
+.quickLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.quickRow {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.quickRow > button {
+  transition:
+    transform 0.2s var(--ease),
+    box-shadow 0.2s var(--ease),
+    background-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+
+/* Buttons are the page's real affordances, so this is the one hover allowed to
+   be visible: a small lift with a chroma bloom under the edge. */
+.quickRow > button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    var(--shadow-md),
+    0 0 0.9rem var(--holo-glow),
+    inset 0 1px 0 rgb(255 255 255 / 90%);
+}
+
+@media (max-width: 52rem) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 30rem) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,48 @@
+.warnings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: var(--warning-soft);
+  border: 1px solid var(--warning-border);
+  color: var(--warning-text);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.8125rem;
+  margin-bottom: 0.9rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+}
+
+.formError {
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-text);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.8125rem;
+  margin-bottom: 0.9rem;
+}
+
+.planner {
+  margin-top: 0.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.subtaskError {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--danger-text);
+}
+
+@media (max-width: 32rem) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

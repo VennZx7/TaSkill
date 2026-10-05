@@ -1,0 +1,95 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.6rem;
+  padding: 0.35rem 0.45rem;
+  background: var(--surface-solid);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  cursor: text;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.box:focus-within {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.18rem 0.28rem 0.18rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.chipRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-subtle);
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.chipRemove:hover {
+  color: var(--danger-text);
+  background: var(--danger-soft);
+}
+
+.chipRemove:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.input {
+  flex: 1;
+  min-width: 7rem;
+  border: 0;
+  background: transparent;
+  padding: 0.2rem 0.15rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--text);
+}
+
+.input:focus {
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-subtle);
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: var(--text-subtle);
+}

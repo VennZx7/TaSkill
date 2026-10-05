@@ -1,0 +1,155 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  /* The sanctioned surface stack: a faint specular sweep and a soft
+     top tint over the glass base. The old inline white 0.75 gradient
+     painted a near-white band across the top of every card in dark
+     mode, washing out the light-on-dark badges in the header. */
+  background:
+    var(--sheen),
+    linear-gradient(180deg, var(--accent-soft) 0%, rgb(0 0 0 / 0) 55%),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem 1.1rem;
+  text-align: left;
+  width: 100%;
+  transition:
+    box-shadow 0.2s var(--ease),
+    transform 0.2s var(--ease),
+    border-color 0.2s var(--ease);
+  overflow: hidden;
+}
+
+/* Elevation plus an iridescent edge — the chroma lives in the border
+   glow, never as a mask over the card body. */
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    var(--shadow-md),
+    0 0 1.1rem var(--holo-glow-soft);
+  border-color: var(--holo-ring);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Status rail: a soft gradient bar pinned to the left edge. */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  background: var(--rail, var(--rail-default));
+  transition: background 0.2s ease;
+}
+
+.overdue {
+  --rail: var(--danger-rail);
+}
+
+.approaching {
+  --rail: var(--warning-rail);
+}
+
+.done {
+  --rail: var(--success-rail);
+}
+
+/* The strikethrough marks the item as done; the title keeps its full
+   contrast so a finished task stays readable in both themes. */
+.done .title {
+  color: var(--text);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-subtle);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.title {
+  font-size: 0.975rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.course {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0.15rem 0.6rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.description {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.statusSelect {
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0.2rem 0.45rem;
+  cursor: pointer;
+  max-width: 8.5rem;
+}
+
+.statusSelect:hover {
+  border-color: var(--border-strong);
+}
+
+.statusSelect:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.actions {
+  display: flex;
+  gap: 0.15rem;
+  margin-left: auto;
+}

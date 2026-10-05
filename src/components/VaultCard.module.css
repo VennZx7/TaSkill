@@ -1,0 +1,168 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  /* The sanctioned surface stack: a faint specular sweep and a soft
+     top tint over the glass base. The old inline white 0.75 gradient
+     painted a near-white band across the top of every card in dark
+     mode, washing out the light-on-dark badges in the header. */
+  background:
+    var(--sheen),
+    linear-gradient(180deg, var(--accent-soft) 0%, rgb(0 0 0 / 0) 55%),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem 1.1rem;
+  transition:
+    box-shadow 0.2s var(--ease),
+    border-color 0.2s var(--ease);
+  overflow: hidden;
+}
+
+/* Elevation plus an iridescent edge — the chroma lives in the border
+   glow, never as a mask over the card body. */
+.card:hover {
+  box-shadow:
+    var(--shadow-md),
+    0 0 1.1rem var(--holo-glow-soft);
+  border-color: var(--holo-ring);
+}
+
+/* Read items recede: the grey rail and the "Sudah dibaca" badge carry
+   the state, so the title keeps its full contrast. */
+.read::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  background: var(--rail-default);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.typeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.headline {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 0.975rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.course {
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.55rem;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.link {
+  font-size: 0.8125rem;
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.link:hover {
+  text-decoration-color: var(--text);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+.preview {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  color: var(--text-subtle);
+}
+
+.tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+.noTags {
+  font-size: 0.75rem;
+  color: var(--text-subtle);
+  font-style: italic;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+
+.meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.actions {
+  display: flex;
+  gap: 0.15rem;
+  flex-wrap: wrap;
+}
