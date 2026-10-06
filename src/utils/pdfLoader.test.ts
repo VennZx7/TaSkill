@@ -118,6 +118,35 @@ describe('extractPdfText', () => {
     expect(result.text).toContain('A');
   });
 
+  it('decodes hexadecimal strings, standalone and inside TJ arrays', async () => {
+    const result = await extractPdfText(
+      singlePagePdf(encoder.encode('BT <48616C6F2064756E6961> Tj ET [(A) <42> (C)] TJ ET')),
+    );
+
+    expect(result.text).toContain('Halo dunia');
+    expect(result.text).toContain('ABC');
+  });
+
+  it('reads streams whose data runs straight into endstream', async () => {
+    // Some generators omit the EOL before endstream; a strict
+    // regex would silently drop every stream in such a file.
+    const content = encoder.encode('BT (Tanpa jeda) Tj ET');
+    const file = pdfFile([
+      '%PDF-1.4\n',
+      '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n',
+      '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n',
+      '3 0 obj << /Type /Page /Parent 2 0 R /Contents 4 0 R >> endobj\n',
+      `4 0 obj << /Length ${content.length} >>\nstream\n`,
+      content,
+      'endstream\nendobj\n',
+      'trailer << /Root 1 0 R >>\n',
+    ]);
+
+    const result = await extractPdfText(file);
+
+    expect(result.text).toBe('Tanpa jeda');
+  });
+
   it('rejects a password-protected PDF', async () => {
     await expect(
       extractPdfText(singlePagePdf(encoder.encode(CONTENT), { encrypt: true })),

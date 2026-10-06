@@ -107,10 +107,10 @@ export function AiAssistantView({
 
             <label className={`${styles.upload} ${styles.input}`}>
               <UploadIcon size={14} />
-              <span>Unggah .txt / .md / .pdf</span>
+              <span>Unggah .txt / .md / .pdf / .docx / .xlsx / .csv</span>
               <input
                 type="file"
-                accept=".txt,.md,.pdf,text/plain,text/markdown,application/pdf"
+                accept=".txt,.md,.pdf,.docx,.xlsx,.csv,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
                 className={styles.fileInput}
                 onChange={(event) => {
                   const file = event.target.files?.[0];
@@ -165,7 +165,7 @@ export function AiAssistantView({
               <h3 className={styles.welcomeTitle}>Tanya apa saja tentang materimu</h3>
               <p className={styles.welcomeBody}>
                 Contoh: “Jelaskan bedanya limit dari kiri dan kanan dengan satu contoh soal.” Pilih
-                atau unggah materi (.txt, .md, .pdf) dulu supaya jawabannya berdasarkan catatanmu.
+                atau unggah materi (.txt, .md, .pdf, .docx, .xlsx) dulu supaya jawabannya berdasarkan catatanmu.
               </p>
             </div>
           ) : (

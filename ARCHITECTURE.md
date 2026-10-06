@@ -388,16 +388,25 @@ The card is one `<button>` holding two faces in one grid cell (`grid-area: 1 / 1
 - Six nav tabs do not fit in one row at 360px, so `AppShell` switches the tab strip to a
   3-column grid at `40rem` and 2 columns at `26rem` rather than a scrolling row.
 
-### PDF uploads in the assistant
+### PDF and Office uploads
 
-PDF text extraction is **native, not a library**: `utils/pdfLoader.ts` scans
-`stream … endstream` regions, inflates FlateDecode streams with the browser's
-`DecompressionStream`, and reads the `Tj` / `TJ` text operators. `pdfjs-dist`
-or `pdf-lib` would break the dependency budget in `CONSTRAINTS.md` §2 for a
-case the platform already covers. The extractor handles the common case
-(text-based PDFs, compressed or plain content streams) and raises user-safe
-errors for password-protected (`/Encrypt`), scanned/image-only, and corrupt
-files. Extracted text flows through the existing `MAX_CONTEXT_CHARS`
-truncation, and the assistant calls `gemini-3.5-flash` with a tutor
-`systemInstruction` that answers strictly from the attached material.
+PDF and Office text extraction is **native, not a library**:
+`utils/pdfLoader.ts` scans `stream … endstream` regions,
+inflates FlateDecode streams with the browser's
+`DecompressionStream`, and reads the `Tj` / `TJ` text
+operators (literal and hex strings). `utils/officeLoader.ts`
+walks the ZIP central directory of `.docx` / `.xlsx` and
+inflates the XML parts the same way. `pdfjs-dist` or an
+office library would break the dependency budget in
+`CONSTRAINTS.md` §2 for cases the platform already covers.
+Both extractors handle the common case and raise user-safe
+errors for password-protected, scanned, encrypted, ZIP64,
+and legacy-binary (`.doc` / `.xls`) files. The upload cap is
+10 MB — real PDFs and Office files run several megabytes.
+Extracted text flows through the existing `MAX_CONTEXT_CHARS`
+truncation, and the assistant calls `gemini-3.5-flash` with a
+tutor `systemInstruction`. The Study Vault stores the
+**extracted text** of an uploaded document (never the binary),
+so a saved material is usable as study context and flashcard
+source; the file name only labels the upload.
 

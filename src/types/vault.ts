@@ -12,7 +12,7 @@ export const VAULT_TYPE_LABEL: Record<VaultType, string> = {
 export const VAULT_TYPE_HINT: Record<VaultType, string> = {
   link: 'Alamat URL',
   note: 'Catatan Anda',
-  document: 'Nama berkas atau lokasi',
+  document: 'Tempel teks atau unggah berkas',
 };
 
 /**

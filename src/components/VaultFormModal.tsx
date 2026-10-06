@@ -8,10 +8,12 @@ import {
   type VaultItem,
   type VaultType,
 } from '../types/vault';
+import { readTextFile } from '../utils/documentLoader';
 import { TITLE_MAX_LENGTH, validateVaultDraft } from '../utils/validation';
 import { TagInput } from './TagInput';
 import { Button } from './ui/Button';
 import { Input, Select, Textarea } from './ui/Field';
+import { UploadIcon } from './ui/icons';
 import { Modal } from './ui/Modal';
 import { useToast } from './ui/Toast';
 import styles from './VaultFormModal.module.css';
@@ -45,12 +47,16 @@ export function VaultFormModal({
 }: VaultFormModalProps) {
   const [draft, setDraft] = useState<VaultDraft>(emptyVaultDraft);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [isLoadingFile, setIsLoadingFile] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
     if (!open) return;
     setDraft(item ? toVaultDraft(item) : emptyVaultDraft());
     setErrors({});
+    setFileName(null);
+    setIsLoadingFile(false);
   }, [open, item]);
 
   const update = <K extends keyof VaultDraft>(key: K, value: VaultDraft[K]) => {
@@ -74,8 +80,32 @@ export function VaultFormModal({
     submit();
   };
 
-  // The control follows the type: a link needs a URL field with url validation,
-  // a note needs room for prose, a document only needs one line for its name.
+  // A document stores its extracted text, not the binary: that is
+  // what makes the material usable as study context and flashcard
+  // source. The file name only labels the upload.
+  const handleFileChosen = async (file: File) => {
+    setIsLoadingFile(true);
+    try {
+      const loaded = await readTextFile(file);
+      update('urlOrContent', loaded.text);
+      if (draft.title.trim().length === 0) {
+        update('title', loaded.name.replace(/\.[^.]+$/, ''));
+      }
+      setFileName(loaded.name);
+      toast({ message: `Konten ${loaded.name} berhasil dimuat.`, tone: 'success' });
+    } catch (error) {
+      toast({
+        message: error instanceof Error ? error.message : 'File gagal dimuat.',
+        tone: 'error',
+      });
+    } finally {
+      setIsLoadingFile(false);
+    }
+  };
+
+  // The control follows the type: a link needs a URL field with url
+  // validation, while a note or document holds prose — typed or
+  // read out of an uploaded file.
   const isLink = draft.type === 'link';
 
   return (
@@ -138,6 +168,35 @@ export function VaultFormModal({
           onChange={(event) => update('title', event.target.value)}
         />
 
+        {draft.type !== 'link' ? (
+          <div className={styles.fileRow}>
+            <label className={styles.fileLabel}>
+              <UploadIcon size={14} />
+              <span>
+                {isLoadingFile
+                  ? 'Membaca berkas…'
+                  : 'Unggah .txt / .md / .pdf / .docx / .xlsx / .csv'}
+              </span>
+              <input
+                type="file"
+                accept=".txt,.md,.pdf,.docx,.xlsx,.csv,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
+                className={styles.fileInput}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) void handleFileChosen(file);
+                  // Reset so picking the same file twice still fires a change.
+                  event.target.value = '';
+                }}
+              />
+            </label>
+            {fileName ? (
+              <span className={styles.fileName} title={fileName}>
+                {fileName}
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+
         {isLink ? (
           <Input
             label="Tautan"
@@ -151,7 +210,7 @@ export function VaultFormModal({
           />
         ) : (
           <Textarea
-            label={draft.type === 'note' ? 'Isi catatan' : 'Nama berkas atau lokasi'}
+            label={draft.type === 'note' ? 'Isi catatan' : 'Isi dokumen'}
             required
             rows={5}
             value={draft.urlOrContent}

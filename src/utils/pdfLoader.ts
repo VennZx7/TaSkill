@@ -56,7 +56,9 @@ async function parsePdf(bytes: Uint8Array): Promise<PdfParseResult> {
   }
 
   if (pages.length === 0) {
-    throw new Error('PDF ini berisi gambar atau hasil pindai tanpa teks yang bisa dibaca.');
+    throw new Error(
+      'PDF ini berisi gambar, hasil pindai, atau kompresi yang tidak didukung (LZW).',
+    );
   }
 
   return { text: pages.join('\n\n'), pageCount: countPages(raw) };
@@ -65,7 +67,10 @@ async function parsePdf(bytes: Uint8Array): Promise<PdfParseResult> {
 /** Every `stream … endstream` region, as raw bytes. */
 function streamRegions(raw: string): Uint8Array<ArrayBuffer>[] {
   const regions: Uint8Array<ArrayBuffer>[] = [];
-  const regex = /stream\r?\n([\s\S]*?)\r?\nendstream/g;
+  // The EOL after `stream` and before `endstream` is optional: some
+  // generators omit either one, and a strict regex would silently
+  // drop every stream in the file.
+  const regex = /stream(?:\r\n|\r|\n)?([\s\S]*?)(?:\r\n|\r|\n)?endstream/g;
   let match: RegExpExecArray | null;
   while ((match = regex.exec(raw)) !== null) {
     regions.push(latin1ToBytes(match[1]));
@@ -118,23 +123,36 @@ function textFromContent(content: string): string {
     }
   };
 
-  const tokenRegex = /(\((?:\\.|[^\\()])*\))|(\[(?:[^\]\r\n])*\])|(\S+)/g;
+  const tokenRegex =
+    /(\((?:\\.|[^\\()])*\))|(\[(?:[^\]\r\n])*\])|(<[0-9A-Fa-f\s]*>)|(\S+)/g;
   let match: RegExpExecArray | null;
   while ((match = tokenRegex.exec(content)) !== null) {
     const literal = match[1];
     const array = match[2];
+    const hex = match[3];
     if (literal !== undefined) {
       current += decodePdfString(literal);
     } else if (array !== undefined) {
       // A TJ array interleaves strings with kerning numbers; keep the words.
-      const inner = /(\((?:\\.|[^\\()])*\))/g;
+      const inner = /(\((?:\\.|[^\\()])*\))|(<[0-9A-Fa-f\s]*>)/g;
       let innerMatch: RegExpExecArray | null;
       while ((innerMatch = inner.exec(array)) !== null) {
-        current += decodePdfString(innerMatch[1]);
+        if (innerMatch[1] !== undefined) {
+          current += decodePdfString(innerMatch[1]);
+        } else if (innerMatch[2] !== undefined) {
+          current += decodePdfHex(innerMatch[2]);
+        }
       }
-    } else if (match[0] === 'Tj' || match[0] === 'TJ' || match[0] === "'" || match[0] === '"') {
+    } else if (hex !== undefined) {
+      current += decodePdfHex(hex);
+    } else if (
+      match[4] === 'Tj' ||
+      match[4] === 'TJ' ||
+      match[4] === "'" ||
+      match[4] === '"'
+    ) {
       flush();
-    } else if (match[0] === 'Td' || match[0] === 'TD' || match[0] === 'T*') {
+    } else if (match[4] === 'Td' || match[4] === 'TD' || match[4] === 'T*') {
       flush();
     }
   }
@@ -186,6 +204,17 @@ function decodePdfString(literal: string): string {
           out += next;
         }
     }
+  }
+  return out;
+}
+
+/** Decodes a PDF hex string (`<48656C6C6F>`) byte-pair by byte-pair. */
+function decodePdfHex(hex: string): string {
+  const digits = hex.slice(1, -1).replace(/\s+/g, '');
+  const padded = digits.length % 2 === 0 ? digits : `${digits}0`;
+  let out = '';
+  for (let i = 0; i < padded.length; i += 2) {
+    out += String.fromCharCode(parseInt(padded.substring(i, i + 2), 16));
   }
   return out;
 }
