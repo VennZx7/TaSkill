@@ -67,6 +67,56 @@ function singlePagePdf(
 const CONTENT =
   'BT /F1 12 Tf 72 720 Td (Halo dunia) Tj ET\nBT /F1 12 Tf 72 700 Td (Baris kedua) Tj ET';
 
+/** A stream object: `N 0 obj << dict /Length n >> stream … endobj`. */
+function streamObject(num: number, dict: string, data: Uint8Array): Segment[] {
+  return [
+    `${num} 0 obj << ${dict} /Length ${data.length} >>\nstream\n`,
+    data,
+    '\nendstream\nendobj\n',
+  ];
+}
+
+/** A realistic ToUnicode CMap: three codes mapped to "Hi!". */
+const CMAP_TEXT = [
+  '/CIDInit /ProcSet findresource begin',
+  '12 dict begin',
+  'begincmap',
+  '/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def',
+  '/CMapName /Adobe-Identity-UCS def',
+  '/CMapType 2 def',
+  '1 begincodespacerange',
+  '<0000> <FFFF>',
+  'endcodespacerange',
+  '2 beginbfchar',
+  '<0003> <0048>',
+  '<0004> <0069>',
+  '<0005> <0021>',
+  'endbfchar',
+  'endcmap',
+  'CMapName currentdict /CMap defineresource pop',
+  'end',
+  'end',
+].join('\n');
+
+/** A one-page PDF whose font F1 is the object at `fontNum`. */
+function fontPdf(
+  content: Uint8Array,
+  fontNum: number,
+  fontDict: string,
+  extraObjects: Segment[] = [],
+): File {
+  return pdfFile([
+    '%PDF-1.4\n',
+    '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n',
+    '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n',
+    `3 0 obj << /Type /Page /Parent 2 0 R /Resources << /Font << /F1 ${fontNum} 0 R >> >> /Contents 5 0 R >> endobj\n`,
+    `4 0 obj ${fontDict} endobj\n`,
+    ...streamObject(5, '', content),
+    ...extraObjects,
+    'trailer << /Root 1 0 R >>\n',
+  ]);
+}
+
 describe('extractPdfText', () => {
   it('extracts text from an uncompressed content stream', async () => {
     const result = await extractPdfText(singlePagePdf(encoder.encode(CONTENT)));
@@ -163,5 +213,60 @@ describe('extractPdfText', () => {
     const file = new File(['ini bukan pdf'], 'bukan.pdf', { type: 'application/pdf' });
 
     await expect(extractPdfText(file)).rejects.toThrow(/valid/i);
+  });
+
+  it('maps character codes through a font ToUnicode CMap', async () => {
+    const content = encoder.encode('BT /F1 12 Tf <000300040005> Tj ET');
+    const cMap = encoder.encode(CMAP_TEXT);
+    const file = fontPdf(
+      content,
+      4,
+      '<< /Type /Font /Subtype /Type0 /BaseFont /ABCDEF+Arial /Encoding /Identity-H /ToUnicode 6 0 R >>',
+      streamObject(6, '', cMap),
+    );
+
+    const result = await extractPdfText(file);
+
+    expect(result.text).toBe('Hi!');
+    // The CMap stream is not page content: it must not leak into the output.
+    expect(result.text).not.toContain('AdobeUCS');
+    expect(result.text).not.toContain('begincmap');
+  });
+
+  it('expands a bfrange onto consecutive code points', async () => {
+    const content = encoder.encode('BT /F1 12 Tf <00010002000300040005> Tj ET');
+    const cMap = encoder.encode([
+      '1 begincodespacerange',
+      '<0000> <FFFF>',
+      'endcodespacerange',
+      '1 beginbfrange',
+      '<0001> <0005> <0041>',
+      'endbfrange',
+    ].join('\n'));
+    const file = fontPdf(
+      content,
+      4,
+      '<< /Type /Font /Subtype /Type0 /BaseFont /ABCDEF+Arial /Encoding /Identity-H /ToUnicode 6 0 R >>',
+      streamObject(6, '', cMap),
+    );
+
+    const result = await extractPdfText(file);
+
+    // Codes 0001–0005 map onto U+0041…U+0045.
+    expect(result.text).toBe('ABCDE');
+  });
+
+  it('maps character codes through a Differences encoding', async () => {
+    const content = encoder.encode('BT /F1 12 Tf (ABCDEF) Tj ET');
+    const file = fontPdf(
+      content,
+      4,
+      '<< /Type /Font /Subtype /Type1 /BaseFont /ABCDEF+Helvetica /Encoding << /Type /Encoding /Differences [ 65 /R 66 /E 67 /S 68 /U 69 /L 70 /T ] >> >>',
+    );
+
+    const result = await extractPdfText(file);
+
+    // Codes 65–70 are redefined to spell RESULT.
+    expect(result.text).toBe('RESULT');
   });
 });
