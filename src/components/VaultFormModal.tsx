@@ -87,10 +87,17 @@ export function VaultFormModal({
     setIsLoadingFile(true);
     try {
       const loaded = await readTextFile(file);
-      update('urlOrContent', loaded.text);
-      if (draft.title.trim().length === 0) {
-        update('title', loaded.name.replace(/\.[^.]+$/, ''));
-      }
+      // A file is never a URL, so receiving one switches the material
+      // to a document and the extracted text becomes its content.
+      setDraft((current) => ({
+        ...current,
+        type: 'document',
+        urlOrContent: loaded.text,
+        title:
+          current.title.trim().length === 0
+            ? loaded.name.replace(/\.[^.]+$/, '')
+            : current.title,
+      }));
       setFileName(loaded.name);
       toast({ message: `Konten ${loaded.name} berhasil dimuat.`, tone: 'success' });
     } catch (error) {
@@ -168,34 +175,35 @@ export function VaultFormModal({
           onChange={(event) => update('title', event.target.value)}
         />
 
-        {draft.type !== 'link' ? (
-          <div className={styles.fileRow}>
-            <label className={styles.fileLabel}>
-              <UploadIcon size={14} />
-              <span>
-                {isLoadingFile
-                  ? 'Membaca berkas…'
-                  : 'Unggah .txt / .md / .pdf / .docx / .xlsx / .csv'}
-              </span>
-              <input
-                type="file"
-                accept=".txt,.md,.pdf,.docx,.xlsx,.csv,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
-                className={styles.fileInput}
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) void handleFileChosen(file);
-                  // Reset so picking the same file twice still fires a change.
-                  event.target.value = '';
-                }}
-              />
-            </label>
-            {fileName ? (
-              <span className={styles.fileName} title={fileName}>
-                {fileName}
-              </span>
-            ) : null}
-          </div>
-        ) : null}
+        {/* Uploading is the primary way to save a document, so the
+            pill stays visible on every type; picking a file flips
+            the material to a document on its own. */}
+        <div className={styles.fileRow}>
+          <label className={styles.fileLabel}>
+            <UploadIcon size={14} />
+            <span>
+              {isLoadingFile
+                ? 'Membaca berkas…'
+                : 'Unggah .txt / .md / .pdf / .docx / .xlsx / .csv'}
+            </span>
+            <input
+              type="file"
+              accept=".txt,.md,.pdf,.docx,.xlsx,.csv,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
+              className={styles.fileInput}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) void handleFileChosen(file);
+                // Reset so picking the same file twice still fires a change.
+                event.target.value = '';
+              }}
+            />
+          </label>
+          {fileName ? (
+            <span className={styles.fileName} title={fileName}>
+              {fileName}
+            </span>
+          ) : null}
+        </div>
 
         {isLink ? (
           <Input

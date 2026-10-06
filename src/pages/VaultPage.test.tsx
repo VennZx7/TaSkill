@@ -8,6 +8,33 @@ import type { VaultItem } from '../types/vault';
 const VAULT_KEY = 'student-tasks:vault';
 const TASK_KEY = 'student-tasks:v1';
 
+const encoder = new TextEncoder();
+
+/** A minimal one-page PDF whose content stream draws `text`,
+ *  so the vault upload path is exercised against a real file. */
+function pdfFile(name: string, text: string): File {
+  const content = encoder.encode(`BT /F1 12 Tf 72 720 Td (${text}) Tj ET`);
+  const segments = [
+    '%PDF-1.4\n',
+    '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n',
+    '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n',
+    '3 0 obj << /Type /Page /Parent 2 0 R /Contents 4 0 R >> endobj\n',
+    `4 0 obj << /Length ${content.length} >>\nstream\n`,
+  ].map((segment) => encoder.encode(segment));
+  const tail = encoder.encode('\nendstream\nendobj\ntrailer << /Root 1 0 R >>\n');
+  const total =
+    segments.reduce((sum, part) => sum + part.length, 0) +
+    content.length +
+    tail.length;
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const part of [...segments, content, tail]) {
+    bytes.set(part, offset);
+    offset += part.length;
+  }
+  return new File([bytes], name, { type: 'application/pdf' });
+}
+
 function makeVaultItem(overrides: Partial<VaultItem> & Pick<VaultItem, 'id' | 'title'>): VaultItem {
   return {
     course: 'Kalkulus Lanjut',
@@ -277,6 +304,44 @@ describe('Study Vault module', () => {
     await user.selectOptions(dialog().getByLabelText(/Jenis/), 'note');
     expect(dialog().getByLabelText(/Isi catatan/)).toBeInTheDocument();
     expect(dialog().queryByLabelText(/^Tautan/)).toBeNull();
+  });
+
+  it('saves an uploaded PDF as a document straight from the default form', async () => {
+    const user = userEvent.setup();
+    render(
+      <ToastProvider>
+        <App />
+      </ToastProvider>,
+    );
+    await openVault(user);
+    await openForm(user);
+
+    // The upload pill is visible even before the type is switched.
+    await user.upload(
+      dialog().getByLabelText(/Unggah/),
+      pdfFile('uts-kalkulus.pdf', 'Limit dan kontinuitas'),
+    );
+
+    expect(await screen.findByText('Konten uts-kalkulus.pdf berhasil dimuat.')).toBeInTheDocument();
+    // Receiving a file flips the material to a document on its own.
+    expect(dialog().getByLabelText(/Jenis/)).toHaveValue('document');
+    expect(dialog().getByLabelText(/Isi dokumen/)).toHaveValue(
+      'Limit dan kontinuitas',
+    );
+    // The file name seeds an empty title.
+    expect(dialog().getByLabelText(/Judul/)).toHaveValue('uts-kalkulus');
+
+    await user.clear(dialog().getByLabelText(/Judul/));
+    await user.type(dialog().getByLabelText(/Judul/), 'Materi UTS Kalkulus');
+    await user.type(dialog().getByLabelText(/Mata kuliah/), 'Kalkulus Lanjut');
+    await user.click(dialog().getByRole('button', { name: 'Simpan' }));
+
+    expect(await screen.findByText('Materi berhasil disimpan.')).toBeInTheDocument();
+    const created = storedVault().find(
+      (item) => item.title === 'Materi UTS Kalkulus',
+    );
+    expect(created?.type).toBe('document');
+    expect(created?.urlOrContent).toBe('Limit dan kontinuitas');
   });
 
   it('edits an existing item, keeping id and read state', async () => {
