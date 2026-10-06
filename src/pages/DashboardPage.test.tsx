@@ -115,6 +115,27 @@ describe('Smart Dashboard', () => {
     await waitForDashboard();
   });
 
+  it('shows the level and XP progress on the landing page', async () => {
+    window.localStorage.setItem(
+      'student-tasks:user',
+      JSON.stringify({ xp: 45 }),
+    );
+    renderApp();
+    await waitForDashboard();
+
+    // The navbar carries a compact copy of the same meter, so the
+    // banner is scoped to the page content.
+    const meter = within(screen.getByRole('main')).getByRole('group', {
+      name: 'Level 1 — Pemula',
+    });
+    expect(meter).toHaveTextContent('Pemula');
+    expect(within(meter).getByRole('progressbar')).toHaveAttribute(
+      'aria-valuenow',
+      '45',
+    );
+    expect(meter).toHaveTextContent('45/100 XP');
+  });
+
   it('shows both stats tiles from the two services', async () => {
     renderApp();
     await waitForDashboard();

@@ -4,6 +4,7 @@ import { ThemeToggle } from './components/ui/ThemeToggle';
 import { ToastProvider } from './components/ui/Toast';
 import { FlashcardProvider } from './context/FlashcardContext';
 import { ItemProvider } from './context/ItemContext';
+import { UserProvider } from './context/UserContext';
 import { VaultProvider } from './context/VaultContext';
 import { useTheme } from './hooks/useTheme';
 import { DashboardPage } from './pages/DashboardPage';
@@ -49,9 +50,11 @@ export function App() {
     <ToastProvider>
       <ItemProvider>
         <VaultProvider>
-          <FlashcardProvider>
-            <Workspace />
-          </FlashcardProvider>
+      <FlashcardProvider>
+        <UserProvider>
+          <Workspace />
+        </UserProvider>
+      </FlashcardProvider>
         </VaultProvider>
       </ItemProvider>
     </ToastProvider>

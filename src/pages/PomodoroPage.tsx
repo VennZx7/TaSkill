@@ -1,8 +1,11 @@
 import { useCallback } from 'react';
 import { PomodoroView } from '../components/PomodoroView';
 import { useToast } from '../components/ui/Toast';
+import { useUser } from '../context/UserContext';
 import { useItems } from '../context/ItemContext';
 import { usePomodoro, type PomodoroMode } from '../hooks/usePomodoro';
+import { POMODORO_XP } from '../services/userService';
+import { fireConfetti } from '../utils/confetti';
 
 const MODE_MESSAGE: Record<PomodoroMode, string> = {
   work: 'Sesi fokus selesai. Istirahat sejenak.',
@@ -16,13 +19,24 @@ const MODE_MESSAGE: Record<PomodoroMode, string> = {
  */
 export function PomodoroPage() {
   const toast = useToast();
+  const { awardXP } = useUser();
   const { visibleItems } = useItems();
 
   const onComplete = useCallback(
     (finished: PomodoroMode) => {
-      toast(MODE_MESSAGE[finished]);
+      // Only a work session earns XP; breaks are rest, not progress.
+      if (finished !== 'work') {
+        toast(MODE_MESSAGE[finished]);
+        return;
+      }
+      const result = awardXP(POMODORO_XP);
+      toast(`Sesi fokus selesai! +${POMODORO_XP} XP.`);
+      if (result.leveledUp) {
+        fireConfetti();
+        toast(`Naik ke Level ${result.level} — ${result.title}!`);
+      }
     },
-    [toast],
+    [toast, awardXP],
   );
 
   const timer = usePomodoro(onComplete);

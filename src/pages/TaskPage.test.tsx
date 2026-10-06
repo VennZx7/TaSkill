@@ -2,11 +2,13 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ItemProvider } from '../context/ItemContext';
+import { UserProvider } from '../context/UserContext';
 import { ToastProvider } from '../components/ui/Toast';
 import { TaskPage } from './HomePage';
 import type { Item, TaskStatus } from '../types/item';
 
 const STORAGE_KEY = 'student-tasks:v1';
+const USER_KEY = 'student-tasks:user';
 
 function makeItem(overrides: Partial<Item> & Pick<Item, 'id' | 'title'>): Item {
   return {
@@ -50,7 +52,9 @@ function renderPage() {
   return render(
     <ToastProvider>
       <ItemProvider>
-        <TaskPage />
+        <UserProvider>
+          <TaskPage />
+        </UserProvider>
       </ItemProvider>
     </ToastProvider>,
   );
@@ -118,6 +122,44 @@ describe('dual view modes', () => {
     const stored = JSON.parse(window.localStorage.getItem(STORAGE_KEY) as string) as Item[];
     const moved = stored.find((item) => item.id === 'far');
     expect(moved?.status).toBe<TaskStatus>('In Progress');
+  });
+
+  it('toasts the XP reward and persists it when an item is marked Done', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await switchToKanban(user);
+
+    const picker = await column('To Do').findByLabelText(
+      'Status untuk Tugas 3 — Matriks dan Determinan',
+    );
+    await user.selectOptions(picker, 'Done');
+
+    expect(
+      await screen.findByText('Task Completed! +20 XP 🚀'),
+    ).toBeInTheDocument();
+    const stored = JSON.parse(
+      window.localStorage.getItem(USER_KEY) as string,
+    ) as { xp: number };
+    expect(stored.xp).toBe(20);
+  });
+
+  it('toasts a level-up when the reward crosses the next level', async () => {
+    window.localStorage.setItem(USER_KEY, JSON.stringify({ xp: 90 }));
+    const user = userEvent.setup();
+    renderPage();
+    await switchToKanban(user);
+
+    const picker = await column('To Do').findByLabelText(
+      'Status untuk Tugas 3 — Matriks dan Determinan',
+    );
+    await user.selectOptions(picker, 'Done');
+
+    expect(
+      await screen.findByText('Task Completed! +20 XP 🚀'),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText('Naik ke Level 2 — Murid Tekun!'),
+    ).toBeInTheDocument();
   });
 });
 

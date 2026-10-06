@@ -1,9 +1,11 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { useUser } from '../context/UserContext';
 import type { Item } from '../types/item';
 import { ITEM_TYPE_LABEL } from '../types/item';
 import type { VaultItem } from '../types/vault';
 import { VAULT_TYPE_LABEL } from '../types/vault';
 import { DeadlineBadge } from './DeadlineBadge';
+import { LevelMeter } from './LevelMeter';
 import { StatTile } from './StatTile';
 import { Button } from './ui/Button';
 import { BoardIcon, CalendarIcon, VaultIcon } from './ui/icons';
@@ -54,8 +56,12 @@ export function DashboardView({
   onGoToScheduler,
   onGoToVault,
 }: DashboardViewProps) {
+  const { level, title, progress } = useUser();
+
   return (
     <div className={styles.stack}>
+      <LevelMeter level={level} title={title} progress={progress} />
+
       <section className={styles.stats} aria-label="Statistik singkat">
         <StatTile
           label="Total Tugas Aktif"

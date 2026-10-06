@@ -10,9 +10,12 @@ import { ViewToggle } from '../components/ViewToggle';
 import { Button } from '../components/ui/Button';
 import { PlusIcon } from '../components/ui/icons';
 import { useToast } from '../components/ui/Toast';
+import { useUser } from '../context/UserContext';
 import { useItems } from '../context/ItemContext';
 import { useViewMode } from '../hooks/useViewMode';
 import { TaskServiceError, ValidationError } from '../services/errors';
+import { TASK_XP } from '../services/userService';
+import { fireConfetti } from '../utils/confetti';
 import type { Item, ItemDraft, TaskStatus } from '../types/item';
 import styles from './HomePage.module.css';
 
@@ -42,6 +45,7 @@ export function TaskPage() {
     remove,
   } = useItems();
   const toast = useToast();
+  const { awardXP } = useUser();
   const { viewMode, setView } = useViewMode();
 
   const [formOpen, setFormOpen] = useState(false);
@@ -87,7 +91,16 @@ export function TaskPage() {
     if (next === item.status) return;
     try {
       await setStatus(item.id, next);
-      toast(`"${item.title}" dipindahkan ke ${next}.`);
+      if (next === 'Done') {
+        const result = awardXP(TASK_XP);
+        toast(`Task Completed! +${TASK_XP} XP 🚀`);
+        if (result.leveledUp) {
+          fireConfetti();
+          toast(`Naik ke Level ${result.level} — ${result.title}!`);
+        }
+      } else {
+        toast(`"${item.title}" dipindahkan ke ${next}.`);
+      }
     } catch (caught) {
       toast({ message: messageOf(caught), tone: 'error' });
     }

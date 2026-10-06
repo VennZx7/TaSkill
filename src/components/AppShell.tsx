@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { useUser } from '../context/UserContext';
+import { LevelMeter } from './LevelMeter';
 import { BrandMarkIcon } from './ui/icons';
 import styles from './AppShell.module.css';
 
@@ -21,6 +23,8 @@ const TABS: { value: Module; label: string }[] = [
 ];
 
 export function AppShell({ module, onNavigate, actions, children }: AppShellProps) {
+  const { level, title, progress } = useUser();
+
   return (
     <div className={styles.shell}>
       <header className={styles.navbar}>
@@ -45,7 +49,10 @@ export function AppShell({ module, onNavigate, actions, children }: AppShellProp
           ))}
         </nav>
 
-        <div className={styles.actions}>{actions}</div>
+        <div className={styles.actions}>
+          <LevelMeter level={level} title={title} progress={progress} variant="compact" />
+          {actions}
+        </div>
       </header>
 
       <main className={styles.main}>{children}</main>
