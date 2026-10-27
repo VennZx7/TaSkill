@@ -3,7 +3,7 @@ import { MAX_CONTEXT_CHARS } from '../services/geminiService';
 import type { ChatMessage } from '../hooks/useAiAssistant';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
-import { NoteIcon, SendIcon, SparkleIcon, UploadIcon } from './ui/icons';
+import { ListIcon, NoteIcon, SendIcon, SparkleIcon, UploadIcon } from './ui/icons';
 import styles from './AiAssistantView.module.css';
 
 interface SelectableItem {
@@ -25,6 +25,7 @@ interface AiAssistantViewProps {
   onFileChosen: (file: File) => void;
   onClearContext: () => void;
   onSend: (message: string) => void;
+  onSummarize: () => void;
 }
 
 export function AiAssistantView({
@@ -41,6 +42,7 @@ export function AiAssistantView({
   onFileChosen,
   onClearContext,
   onSend,
+  onSummarize,
 }: AiAssistantViewProps) {
   const [draft, setDraft] = useState('');
   const [selectedId, setSelectedId] = useState('');
@@ -143,6 +145,16 @@ export function AiAssistantView({
               {contextChars.toLocaleString('id-ID')} karakter
               {contextChars > MAX_CONTEXT_CHARS ? ' (dipotong)' : ''}
             </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onSummarize}
+              disabled={isThinking}
+              title="Buat ringkasan otomatis dari materi ini"
+            >
+              <ListIcon size={14} />
+              Rangkum
+            </Button>
             <Button variant="ghost" size="sm" onClick={onClearContext}>
               Hapus konteks
             </Button>

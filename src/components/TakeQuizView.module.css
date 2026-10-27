@@ -1,0 +1,301 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.headline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.meta {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* --- Score card -------------------------------------------------- */
+.scoreCard {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  padding: 0.8rem 1rem;
+  background: var(--accent-soft);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.scoreCard > div {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.scorePerfect {
+  border-color: var(--success-border);
+  background: var(--success-soft);
+}
+
+.scoreIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.scorePerfect .scoreIcon {
+  color: var(--success-text);
+  border-color: var(--success-border);
+}
+
+.scoreValue {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.scoreNote {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* --- Questions --------------------------------------------------- */
+.questions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.question {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.9rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.questionHead {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.number {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.prompt {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+/* One radio row per option: the native input stays
+   focusable, the tile is the visible control. */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-solid);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.option:hover {
+  border-color: var(--holo-ring);
+}
+
+.option:focus-within {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.optionChosen {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* The key is marked in the success tones, a wrong pick in the
+   danger tones — text keeps the neutral tokens either way. */
+.optionKey {
+  border-color: var(--success-border);
+  background: var(--success-soft);
+}
+
+.optionWrong {
+  border-color: var(--danger-border);
+  background: var(--danger-soft);
+}
+
+.radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.optionLetter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.optionText {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.optionMark {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.optionKey .optionMark {
+  color: var(--success-text);
+}
+
+.optionWrong .optionMark {
+  color: var(--danger-text);
+}
+
+.modelAnswer {
+  padding: 0.55rem 0.7rem;
+  border-left: 3px solid var(--success-border);
+  background: var(--success-soft);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.modelLabel {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--success-text);
+  margin-bottom: 0.15rem;
+}
+
+.modelText {
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.explanation {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+  padding: 0.55rem 0.7rem;
+  background: var(--surface-muted);
+  border-radius: var(--radius-sm);
+}
+
+.explanationLabel {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-subtle);
+  margin-bottom: 0.15rem;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.25rem;
+}
+
+@media (max-width: 30rem) {
+  .header {
+    align-items: stretch;
+  }
+
+  .headerActions {
+    justify-content: space-between;
+  }
+
+  .scoreCard {
+    align-items: flex-start;
+  }
+
+  .footer {
+    justify-content: stretch;
+  }
+
+  .footer > button {
+    flex: 1;
+    justify-content: center;
+  }
+}

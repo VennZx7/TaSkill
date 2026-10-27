@@ -8,6 +8,7 @@ import {
   parseFlashcardPayload,
   readGeminiKey,
   saveGeminiKey,
+  summarizeMaterial,
 } from './geminiService';
 
 function geminiResponse(text: string): Response {
@@ -153,6 +154,42 @@ describe('askGemini', () => {
     const body = JSON.parse(String(init.body));
     expect(body.contents[0].parts[0].text.length).toBeLessThan(MAX_CONTEXT_CHARS + 1000);
     expect(body.contents[0].parts[0].text).toContain('dipotong');
+  });
+});
+
+describe('summarizeMaterial', () => {
+  it('routes the material through the Flash model with the tutor instruction', async () => {
+    const fetchMock = vi.fn(async () => geminiResponse('Ringkasannya.'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const summary = await summarizeMaterial('AIzaTest', 'Limit fungsi dan kontinuitas.');
+
+    expect(summary).toBe('Ringkasannya.');
+
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toContain('gemini-3.5-flash');
+    const body = JSON.parse(String(init.body));
+    expect(body.systemInstruction.parts[0].text).toBe(TUTOR_SYSTEM_INSTRUCTION);
+    expect(body.contents[0].parts[0].text).toMatch(/ringkasan/i);
+    expect(body.contents[0].parts[0].text).toContain('Limit fungsi dan kontinuitas.');
+  });
+
+  it('caps the attached material so a huge PDF cannot balloon the request', async () => {
+    const fetchMock = vi.fn(async () => geminiResponse('Ringkasannya.'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await summarizeMaterial('AIzaTest', 'a'.repeat(MAX_CONTEXT_CHARS + 500));
+
+    const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    const body = JSON.parse(String(init.body));
+    expect(body.contents[0].parts[0].text.length).toBeLessThan(MAX_CONTEXT_CHARS + 1000);
+    expect(body.contents[0].parts[0].text).toContain('dipotong');
+  });
+
+  it('rejects without a key instead of calling Gemini', async () => {
+    await expect(summarizeMaterial('  ', 'Limit fungsi')).rejects.toThrow(
+      /API Key belum diisi/i,
+    );
   });
 });
 

@@ -19,7 +19,7 @@ const TABS: { value: Module; label: string }[] = [
   { value: 'vault', label: 'Study Vault' },
   { value: 'pomodoro', label: 'Focus' },
   { value: 'ai', label: 'AI Assistant' },
-  { value: 'flashcards', label: 'Flashcards' },
+  { value: 'flashcards', label: 'Quiz' },
 ];
 
 export function AppShell({ module, onNavigate, actions, children }: AppShellProps) {

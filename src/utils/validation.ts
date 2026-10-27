@@ -1,5 +1,6 @@
 import { isItemType, isTaskPriority, isTaskStatus, type ItemDraft } from '../types/item';
 import type { FlashcardDeckDraft } from '../types/flashcard';
+import type { QuizSetDraft } from '../types/quiz';
 import { isVaultType, type VaultDraft } from '../types/vault';
 import { CRITICAL_THRESHOLD_MS, inputValueToInstant, inputValueToStorageISO } from './date';
 
@@ -205,4 +206,60 @@ export function validateFlashcardDeckDraft(draft: FlashcardDeckDraft): Flashcard
   }
 
   return { ok: true, value: { title, vaultItemId: draft.vaultItemId, cards } };
+}
+
+export type QuizSetResult =
+  | { ok: true; value: QuizSetDraft }
+  | { ok: false; errors: Record<string, string> };
+
+/**
+ * Validates a quiz set before it is saved. Never throws. A
+ * question missing a prompt or an answer is dropped, a choice
+ * question needs at least two options and an answer that names
+ * one of them, and a set with no usable question left is a
+ * hard error — an empty quiz has nothing to take.
+ */
+export function validateQuizSetDraft(draft: QuizSetDraft): QuizSetResult {
+  const errors: Record<string, string> = {};
+
+  const title = draft.title.trim();
+  if (title.length === 0) {
+    errors.title = 'Judul kuis wajib diisi.';
+  } else if (title.length > TITLE_MAX_LENGTH) {
+    errors.title = `Judul maksimal ${TITLE_MAX_LENGTH} karakter.`;
+  }
+
+  const questions = draft.questions.flatMap((question) => {
+    const prompt = question.prompt.trim();
+    const explanation = question.explanation.trim();
+    if (prompt.length === 0) return [];
+
+    if (question.kind === 'choice') {
+      const options = question.options
+        .map((option) => option.trim())
+        .filter((option) => option.length > 0);
+      // The correct answer must survive normalization and still
+      // name one of the options, or the question cannot be scored.
+      const answer = question.options[question.correctIndex]?.trim() ?? '';
+      const correctIndex = options.findIndex((option) => option === answer);
+      return options.length >= 2 && correctIndex !== -1
+        ? [{ kind: 'choice' as const, prompt, options, correctIndex, explanation }]
+        : [];
+    }
+
+    const answer = question.answer.trim();
+    return answer.length > 0
+      ? [{ kind: 'short' as const, prompt, answer, explanation }]
+      : [];
+  });
+
+  if (questions.length === 0) {
+    errors.questions = 'Kuis harus punya minimal satu soal yang terisi.';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return { ok: false, errors };
+  }
+
+  return { ok: true, value: { title, materialId: draft.materialId, questions } };
 }

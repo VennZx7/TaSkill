@@ -126,7 +126,8 @@
   max-width: 18rem;
 }
 
-.contextBar > button {
+/* The first action button absorbs the free space; the rest sit next to it. */
+.contextBar > button:first-of-type {
   margin-left: auto;
 }
 

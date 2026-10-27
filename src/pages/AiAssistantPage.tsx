@@ -13,7 +13,8 @@ export function AiAssistantPage() {
         <h2 className={styles.heading}>AI Study Assistant</h2>
         <p className={styles.subheading}>
           Tanya Gemini tentang materi pilihanmu. Konteks dikirim bersama pertanyaan, jadi
-          jawabannya spesifik pada catatanmu, bukan umum.
+          jawabannya spesifik pada catatanmu, bukan umum. Tekan tombol Rangkum untuk
+          ringkasan otomatis dari materi yang sedang dimuat.
         </p>
       </div>
 
@@ -37,6 +38,7 @@ export function AiAssistantPage() {
         onFileChosen={(file) => void assistant.loadFromFile(file)}
         onClearContext={assistant.clearContext}
         onSend={(message) => void assistant.send(message)}
+        onSummarize={() => void assistant.summarize()}
       />
     </div>
   );

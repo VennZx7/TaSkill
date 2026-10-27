@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useToast } from '../components/ui/Toast';
 import { useVault } from '../context/VaultContext';
-import { askGemini, readGeminiKey, saveGeminiKey } from '../services/geminiService';
+import { askGemini, readGeminiKey, saveGeminiKey, summarizeMaterial } from '../services/geminiService';
 import { createId } from '../utils/id';
 import { readTextFile, type LoadedDocument } from '../utils/documentLoader';
 import { isStudyMaterial, type VaultItem } from '../types/vault';
@@ -88,6 +88,46 @@ export function useAiAssistant() {
     [apiKey, documentContext, messages, isThinking, toast],
   );
 
+  /** The "Rangkum" button: summarizes the loaded material in one click.
+   *  Travels through the chat so the summary is visible next to the
+   *  material it came from, and so failures surface in both the log
+   *  and a Toast. */
+  const summarize = useCallback(async () => {
+    const material = documentContext.trim();
+    if (isThinking) return;
+    if (material.length === 0) {
+      toast({
+        message: 'Muat materi dari Study Vault atau unggah berkas lebih dulu.',
+        tone: 'error',
+      });
+      return;
+    }
+
+    const userMessage: ChatMessage = {
+      id: createId(),
+      role: 'user',
+      text: 'Buatkan ringkasan dari materi ini.',
+    };
+    const history = [...messages, userMessage];
+    setMessages(history);
+    setIsThinking(true);
+
+    try {
+      const summary = await summarizeMaterial(apiKey, documentContext);
+      setMessages([...history, { id: createId(), role: 'assistant', text: summary }]);
+      toast('Rangkuman materi selesai dibuat.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Terjadi kesalahan tak terduga.';
+      toast({ message, tone: 'error' });
+      setMessages([
+        ...history,
+        { id: createId(), role: 'assistant', text: `Maaf, rangkuman gagal dibuat. ${message}` },
+      ]);
+    } finally {
+      setIsThinking(false);
+    }
+  }, [apiKey, documentContext, isThinking, messages, toast]);
+
   return {
     apiKey,
     setApiKey,
@@ -103,5 +143,6 @@ export function useAiAssistant() {
     loadFromFile,
     clearContext,
     send,
+    summarize,
   };
 }

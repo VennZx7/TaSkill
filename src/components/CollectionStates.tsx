@@ -37,6 +37,14 @@ export const FLASHCARD_EMPTY: EmptyCopy = {
   noResultsBody: 'Coba ubah kata kunci atau mata kuliah yang dipilih.',
 };
 
+export const QUIZ_EMPTY: EmptyCopy = {
+  noItemsTitle: 'Belum ada set kuis',
+  noItemsBody: 'Biarkan Gemini menyusun soal pilihan ganda dan jawaban singkat dari materi Study Vault.',
+  noItemsAction: 'Generate dengan AI',
+  noResultsTitle: 'Tidak ada kuis yang cocok',
+  noResultsBody: 'Coba ubah kata kunci atau mata kuliah yang dipilih.',
+};
+
 interface CollectionStatesProps {
   status: 'loading' | 'ready' | 'error';
   error: string | null;

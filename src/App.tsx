@@ -4,15 +4,17 @@ import { ThemeToggle } from './components/ui/ThemeToggle';
 import { ToastProvider } from './components/ui/Toast';
 import { FlashcardProvider } from './context/FlashcardContext';
 import { ItemProvider } from './context/ItemContext';
+import { QuizProvider } from './context/QuizContext';
 import { UserProvider } from './context/UserContext';
 import { VaultProvider } from './context/VaultContext';
 import { useTheme } from './hooks/useTheme';
 import { DashboardPage } from './pages/DashboardPage';
 import { TaskPage } from './pages/HomePage';
 import { PomodoroPage } from './pages/PomodoroPage';
+import { QuizView } from './pages/QuizPage';
 import { VaultPage } from './pages/VaultPage';
 import { AiAssistantPage } from './pages/AiAssistantPage';
-import { FlashcardPage } from './pages/FlashcardPage';
+import { LandingPage } from './pages/landing/LandingPage';
 
 /**
  * No router is installed, and one is not needed: six modules behind one shell,
@@ -28,35 +30,43 @@ function Workspace() {
       onNavigate={setModule}
       actions={<ThemeToggle theme={theme} onToggle={toggle} />}
     >
-      {module === 'dashboard' ? (
-        <DashboardPage onNavigate={setModule} />
-      ) : module === 'scheduler' ? (
-        <TaskPage />
-      ) : module === 'pomodoro' ? (
-        <PomodoroPage />
-      ) : module === 'ai' ? (
-        <AiAssistantPage />
-      ) : module === 'flashcards' ? (
-        <FlashcardPage />
-      ) : (
-        <VaultPage />
-      )}
+        {module === 'dashboard' ? (
+          <DashboardPage onNavigate={setModule} />
+        ) : module === 'scheduler' ? (
+          <TaskPage />
+        ) : module === 'pomodoro' ? (
+          <PomodoroPage />
+        ) : module === 'ai' ? (
+          <AiAssistantPage />
+        ) : module === 'flashcards' ? (
+          <QuizView />
+        ) : (
+          <VaultPage />
+        )}
     </AppShell>
   );
 }
 
 export function App() {
+  const [entered, setEntered] = useState(false);
+
+  if (!entered) {
+    return <LandingPage onEnter={() => setEntered(true)} />;
+  }
+
   return (
-    <ToastProvider>
-      <ItemProvider>
-        <VaultProvider>
-      <FlashcardProvider>
-        <UserProvider>
-          <Workspace />
-        </UserProvider>
-      </FlashcardProvider>
-        </VaultProvider>
-      </ItemProvider>
-    </ToastProvider>
+      <ToastProvider>
+        <ItemProvider>
+          <VaultProvider>
+            <FlashcardProvider>
+              <QuizProvider>
+                <UserProvider>
+                  <Workspace />
+                </UserProvider>
+              </QuizProvider>
+            </FlashcardProvider>
+          </VaultProvider>
+        </ItemProvider>
+      </ToastProvider>
   );
 }
