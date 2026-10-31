@@ -39,7 +39,8 @@ export function useAiAssistant() {
     setDocumentContext(item.urlOrContent);
     setContextLabel(item.title);
     // setContextPages(null);
-    
+    const pages = (item.sources ?? []).reduce((sum, s) => sum + (s.pageCount ?? 0), 0);
+    setContextPages(pages > 0 ? pages : null);
   }, []);
 
   const loadFromFile = useCallback(
