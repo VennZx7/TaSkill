@@ -9,6 +9,7 @@ export interface QuestionAttempt {
 }
 
 export interface TopicStat {
+  materialId: string | null;
   topic: string;
   attempts: number;
   correct: number;

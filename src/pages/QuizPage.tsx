@@ -16,6 +16,20 @@ import type { FlashcardDeck } from '../types/flashcard';
 import type { QuizSet } from '../types/quiz';
 import { QUIZ_COUNTS } from '../types/quiz';
 import styles from './QuizPage.module.css';
+import { weakTopics } from '../services/attemptService';
+import { generateQuiz, readGeminiKey } from '../services/geminiService';
+import { useVault } from '../context/VaultContext';
+
+// const { visibleItems } = useVault();
+// const { create: createQuiz } = useQuizzes();
+// const [practicing, setPracticing] = useState<string | null>(null);
+
+// Dihitung tiap render; murah, dan ikut segar saat kembali dari TakeQuizView.
+const weakByMaterial = new Map<string, string[]>();
+for (const stat of weakTopics()) {
+  const id = stat.materialId as string;
+  weakByMaterial.set(id, [...(weakByMaterial.get(id) ?? []), stat.topic]);
+}
 
 type QuizTab = 'quizzes' | 'flashcards';
 
@@ -39,12 +53,14 @@ function messageOf(error: unknown): string {
 export function QuizView() {
   const toast = useToast();
   const generator = useQuizGenerator();
+  const { visibleItems } = useVault();
   const {
     status: quizStatus,
     error: quizError,
     sets: quizzes,
     reload: reloadQuizzes,
     remove: removeQuiz,
+    create: createQuiz,
   } = useQuizzes();
   const {
     status: deckStatus,
@@ -61,12 +77,43 @@ export function QuizView() {
   const [deletingQuiz, setDeletingQuiz] = useState<QuizSet | null>(null);
   const [deletingDeck, setDeletingDeck] = useState<FlashcardDeck | null>(null);
   const [saving, setSaving] = useState(false);
+  const [practicing, setPracticing] = useState<string | null>(null);
 
   // Resolved by id on every render, so deleting a set
   // or reloading a list can never leave a view showing
   // a record that is no longer stored.
   const activeQuiz = quizzes.find((set) => set.id === taking) ?? null;
   const activeDeck = decks.find((deck) => deck.id === studying) ?? null;
+
+    // Dihitung tiap render; murah, dan ikut segar saat kembali dari TakeQuizView.
+  const weakByMaterial = new Map<string, string[]>();
+  for (const stat of weakTopics()) {
+    const id = stat.materialId as string;
+    weakByMaterial.set(id, [...(weakByMaterial.get(id) ?? []), stat.topic]);
+  }
+
+  const practiceWeak = async (materialId: string, topics: string[]) => {
+    const item = visibleItems.find((entry) => entry.id === materialId);
+    if (!item) {
+      toast({ message: 'Materi asal tidak ditemukan (dihapus atau tersaring).', tone: 'error' });
+      return;
+    }
+    setPracticing(materialId);
+    try {
+      const questions = await generateQuiz(readGeminiKey(), item.urlOrContent, 8, undefined, topics);
+      const set = await createQuiz({
+        title: `${item.title} — Latihan area lemah`,
+        materialId,
+        questions,
+      });
+      toast(`Kuis latihan dibuat (${questions.length} soal).`);
+      setTaking(set.id);
+    } catch (caught) {
+      toast({ message: messageOf(caught), tone: 'error' });
+    } finally {
+      setPracticing(null);
+    }
+  };
 
   const openQuiz = (set: QuizSet) => {
     setTaking(set.id);
@@ -170,6 +217,23 @@ export function QuizView() {
                 {quizzes.length} set · {quizTotalQuestions} soal tersimpan
               </p>
             ) : null}
+
+            {[...weakByMaterial].map(([materialId, topics]) => {
+              const title = visibleItems.find((i) => i.id === materialId)?.title ?? 'Materi';
+              return (
+                <p key={materialId} className={styles.summary}>
+                  Area lemah di “{title}”: {topics.join(', ')}
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    disabled={practicing !== null}
+                    onClick={() => void practiceWeak(materialId, topics)}
+                  >
+                    {practicing === materialId ? 'Membuat…' : 'Latihan area lemah'}
+                  </Button>
+                </p>
+              );
+            })}
 
             <QuizSetList
               status={quizStatus}

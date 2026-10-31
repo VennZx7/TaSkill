@@ -1,10 +1,11 @@
+// services/attemptService.ts
 import type { QuestionAttempt, TopicStat } from '../types/attempt';
 import { createId } from '../utils/id';
 
-const KEY = 'student-tasks:attempts'; // samakan prefix dengan repository lain
+const KEY = 'student-tasks:attempts';
 const WEAK_ACCURACY = 0.6;
 const MIN_ATTEMPTS = 3;
-const MAX_STORED = 2000; // jaga agar LocalStorage tidak penuh
+const MAX_STORED = 2000;
 
 function readAll(): QuestionAttempt[] {
   try {
@@ -14,30 +15,36 @@ function readAll(): QuestionAttempt[] {
   }
 }
 
-export function recordAttempts(
-  entries: Omit<QuestionAttempt, 'id' | 'at'>[],
-): void {
+export function recordAttempts(entries: Omit<QuestionAttempt, 'id' | 'at'>[]): void {
+  if (entries.length === 0) return;
   const at = new Date().toISOString();
   const next = [...readAll(), ...entries.map((e) => ({ ...e, id: createId(), at }))];
-  localStorage.setItem(KEY, JSON.stringify(next.slice(-MAX_STORED)));
+  try {
+    localStorage.setItem(KEY, JSON.stringify(next.slice(-MAX_STORED)));
+  } catch {
+    // Best-effort: gagal menyimpan statistik tidak boleh menggagalkan kuis.
+  }
 }
 
-export function topicStats(materialId?: string | null): TopicStat[] {
-  const map = new Map<string, { attempts: number; correct: number }>();
+export function topicStats(): TopicStat[] {
+  // Kunci huruf kecil supaya "Fotosintesis" dan "fotosintesis " tergabung.
+  const map = new Map<string, TopicStat>();
   for (const a of readAll()) {
-    if (materialId !== undefined && a.materialId !== materialId) continue;
-    const s = map.get(a.topic) ?? { attempts: 0, correct: 0 };
+    const key = `${a.materialId ?? ''}|${a.topic.trim().toLowerCase()}`;
+    const s = map.get(key) ?? {
+      materialId: a.materialId, topic: a.topic.trim(), attempts: 0, correct: 0, accuracy: 0,
+    };
     s.attempts += 1;
     if (a.correct) s.correct += 1;
-    map.set(a.topic, s);
+    s.accuracy = s.correct / s.attempts;
+    map.set(key, s);
   }
-  return [...map].map(([topic, s]) => ({
-    topic, ...s, accuracy: s.correct / s.attempts,
-  }));
+  return [...map.values()];
 }
 
-export function weakTopics(materialId?: string | null): TopicStat[] {
-  return topicStats(materialId)
-    .filter((s) => s.attempts >= MIN_ATTEMPTS && s.accuracy < WEAK_ACCURACY)
+/** Hanya topik dari materi tersimpan, karena kuis latihan butuh teks materinya. */
+export function weakTopics(): TopicStat[] {
+  return topicStats()
+    .filter((s) => s.materialId !== null && s.attempts >= MIN_ATTEMPTS && s.accuracy < WEAK_ACCURACY)
     .sort((a, b) => a.accuracy - b.accuracy);
 }

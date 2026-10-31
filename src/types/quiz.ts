@@ -20,6 +20,7 @@ export interface ChoiceQuestion {
   /** Index into `options`. */
   correctIndex: number;
   explanation: string;
+  topic?: string;
 }
 
 export interface ShortQuestion {
@@ -29,6 +30,7 @@ export interface ShortQuestion {
   /** The model answer, revealed for self-check after submitting. */
   answer: string;
   explanation: string;
+  topic?: string;
 }
 
 export type QuizQuestion = ChoiceQuestion | ShortQuestion;
@@ -59,8 +61,9 @@ export interface QuizSetDraft {
         options: string[];
         correctIndex: number;
         explanation: string;
+        topic?: string;
       }
-    | { kind: 'short'; prompt: string; answer: string; explanation: string }
+    | { kind: 'short'; prompt: string; answer: string; explanation: string; topic?: string }
   >;
 }
 

@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useQuizzes } from '../context/QuizContext';
-import type { QuizSet } from '../types/quiz';
-import { formatToWIB } from '../utils/date';
+import { recordAttempts } from '../services/attemptService';
 import { TaskServiceError } from '../services/errors';
+import type { QuizSet, ShortQuestion } from '../types/quiz';
+import { formatToWIB } from '../utils/date';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { Textarea } from './ui/Field';
@@ -23,14 +24,17 @@ function messageOf(error: unknown): string {
 /**
  * Takes one quiz. Choice questions are auto-scored
  * against the stored correct option; short answers are
- * revealed for self-check. Submitting stamps lastStudied
- * through the service so the progress persists.
+ * revealed for self-check, and the student marks them
+ * right or wrong. Every graded answer is recorded per
+ * topic so weak areas can be found later. Submitting
+ * stamps lastStudied through the service.
  */
 export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
   const toast = useToast();
   const { markStudied } = useQuizzes();
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [selfGrade, setSelfGrade] = useState<Record<string, boolean>>({});
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -54,6 +58,20 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
   const setAnswer = (id: string, value: string) =>
     setAnswers((previous) => ({ ...previous, [id]: value }));
 
+  const gradeShort = (question: ShortQuestion, correct: boolean) => {
+    if (question.id in selfGrade) return;
+    setSelfGrade((previous) => ({ ...previous, [question.id]: correct }));
+    recordAttempts([
+      {
+        quizId: quiz.id,
+        questionId: question.id,
+        materialId: quiz.materialId,
+        topic: question.topic ?? 'Umum',
+        correct,
+      },
+    ]);
+  };
+
   const submit = async () => {
     const unanswered = quiz.questions.filter(
       (question) => (answers[question.id] ?? '').trim().length === 0,
@@ -68,6 +86,21 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
 
     setIsSubmitting(true);
     setSubmitted(true);
+
+    // Choice questions are scored automatically, so they are recorded here.
+    // Short answers are recorded one by one when the student self-grades.
+    recordAttempts(
+      choiceQuestions.map((question) => ({
+        quizId: quiz.id,
+        questionId: question.id,
+        materialId: quiz.materialId,
+        topic: question.topic ?? 'Umum',
+        correct:
+          (answers[question.id] ?? '').trim().toLowerCase() ===
+          question.options[question.correctIndex].trim().toLowerCase(),
+      })),
+    );
+
     toast(`Kuis selesai. Skor ${score.correct} dari ${score.total}.`);
     try {
       await markStudied(quiz.id);
@@ -80,6 +113,7 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
 
   const retry = () => {
     setAnswers({});
+    setSelfGrade({});
     setSubmitted(false);
   };
 
@@ -105,15 +139,10 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
       {submitted ? (
         <div
           className={`${styles.scoreCard} ${
-            score.correct === score.total && score.total > 0
-              ? styles.scorePerfect
-              : ''
+            score.correct === score.total && score.total > 0 ? styles.scorePerfect : ''
           }`}
         >
-          <span
-            className={styles.scoreIcon}
-            aria-hidden="true"
-          >
+          <span className={styles.scoreIcon} aria-hidden="true">
             {score.correct === score.total && score.total > 0 ? (
               <CheckCircleIcon size={20} />
             ) : (
@@ -125,8 +154,8 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
               Skor: {score.correct} dari {score.total} soal pilihan ganda
             </p>
             <p className={styles.scoreNote}>
-              Soal jawaban singkat ditampilkan di bawah untuk pemeriksaan
-              sendiri.
+              Soal jawaban singkat ditampilkan di bawah. Nilai sendiri dengan tombol
+              “Aku benar / Aku salah” agar tercatat di statistik area lemah.
             </p>
           </div>
           <Button variant="secondary" size="sm" onClick={retry}>
@@ -153,6 +182,7 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
                 <Badge tone={isChoice ? 'accent' : 'neutral'}>
                   {isChoice ? 'Pilihan ganda' : 'Jawaban singkat'}
                 </Badge>
+                {question.topic ? <Badge tone="neutral">{question.topic}</Badge> : null}
                 {isChoice && submitted ? (
                   isCorrect ? (
                     <Badge tone="success" dot>
@@ -218,10 +248,32 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
                 />
               )}
 
-              {submitted && !isChoice ? (
+              {submitted && question.kind === 'short' ? (
                 <div className={styles.modelAnswer}>
                   <span className={styles.modelLabel}>Jawaban model</span>
                   <p className={styles.modelText}>{question.answer}</p>
+                  {question.id in selfGrade ? (
+                    <Badge tone={selfGrade[question.id] ? 'success' : 'danger'} dot>
+                      {selfGrade[question.id] ? 'Kamu menilai: benar' : 'Kamu menilai: salah'}
+                    </Badge>
+                  ) : (
+                    <div>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => gradeShort(question, true)}
+                      >
+                        Aku benar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => gradeShort(question, false)}
+                      >
+                        Aku salah
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ) : null}
 

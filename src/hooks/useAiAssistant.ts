@@ -38,7 +38,8 @@ export function useAiAssistant() {
   const loadFromVault = useCallback((item: VaultItem) => {
     setDocumentContext(item.urlOrContent);
     setContextLabel(item.title);
-    setContextPages(null);
+    // setContextPages(null);
+    
   }, []);
 
   const loadFromFile = useCallback(

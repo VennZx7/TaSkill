@@ -14,10 +14,11 @@ export const TUTOR_SYSTEM_INSTRUCTION = [
   'Jika materi tidak membahas pertanyaan, katakan bahwa materi tidak membahasnya; jangan mengarang informasi.',
   'Jika tidak ada materi yang diberikan, jawab sebagai tutor yang ringkas dan umum.',
   'Gunakan bahasa Indonesia kecuali pertanyaan memakai bahasa lain.',
+  'Materi bisa terdiri dari beberapa berkas yang diberi header "=== nama ==="; sebutkan nama berkas sumber jika relevan.',
 ].join(' ');
 
 /** A study note can be long; the prompt is capped so a paste cannot be unbounded. */
-export const MAX_CONTEXT_CHARS = 8000;
+export const MAX_CONTEXT_CHARS = 240_000;
 
 const KEY_STORAGE_KEY = 'student-tasks:gemini-key';
 
@@ -44,7 +45,12 @@ export function saveGeminiKey(key: string): void {
 
 function truncate(text: string): string {
   if (text.length <= MAX_CONTEXT_CHARS) return text;
-  return `${text.slice(0, MAX_CONTEXT_CHARS)}\n\n[...materi dipotong pada ${MAX_CONTEXT_CHARS} karakter]`;
+  // Bagi jatah per berkas, jadi PDF terakhir tidak hilang.
+  const sections = text.split(/\n\n(?==== .+ ===\n)/);
+  const budget = Math.floor(MAX_CONTEXT_CHARS / sections.length);
+  return sections
+    .map((s) => (s.length <= budget ? s : `${s.slice(0, budget)}\n[...dipotong]`))
+    .join('\n\n');
 }
 
 /**
@@ -284,6 +290,7 @@ export interface ParsedQuizQuestion {
   correctIndex: number;
   answer: string;
   explanation: string;
+  topic: string;
 }
 
 /**
@@ -292,11 +299,14 @@ export interface ParsedQuizQuestion {
  * choice answer must quote one of its own options exactly,
  * or the question is dropped by the parser.
  */
-export function buildQuizPrompt(material: string, count: number): string {
+export function buildQuizPrompt(material: string, count: number, focusTopics: string[] = []): string {
   return [
     `Buat ${count} soal kuis dari materi berikut:`,
     truncate(material.trim()),
     '',
+    ...(focusTopics.length > 0
+      ? [`Fokuskan soal pada topik yang masih lemah ini: ${focusTopics.join('; ')}. Pakai nama topik persis seperti itu.`, '']
+      : []),
     'Aturan format, wajib dipatuhi:',
     '- Balas hanya dengan JSON array, tanpa teks pembuka atau penutup.',
     '- Separuh soal "kind": "choice", sisanya "kind": "short".',
@@ -305,6 +315,7 @@ export function buildQuizPrompt(material: string, count: number): string {
     '- Soal "short" punya kunci "prompt", "answer" (jawaban model singkat), dan "explanation".',
     '- Jangan memakai markdown, jangan membungkus hasil dengan ```json.',
     '- Tulis dalam bahasa Indonesia.',
+    '- Setiap soal punya kunci "topic": nama subtopik 2-4 kata. Soal dengan subtopik sama harus memakai teks topic yang persis sama.',
   ].join('\n');
 }
 
@@ -337,6 +348,7 @@ export function parseQuizPayload(text: string): ParsedQuizQuestion[] {
 
     const prompt = typeof raw.prompt === 'string' ? raw.prompt.trim() : '';
     const explanation = typeof raw.explanation === 'string' ? raw.explanation.trim() : '';
+    const topic = typeof raw.topic === 'string' && raw.topic.trim() ? raw.topic.trim() : 'Umum';
     if (prompt.length === 0) return [];
 
     if (raw.kind === 'choice') {
@@ -352,13 +364,13 @@ export function parseQuizPayload(text: string): ParsedQuizQuestion[] {
       const correctIndex = options.findIndex((option) => option === answer);
       if (correctIndex === -1) return [];
 
-      return [{ kind: 'choice' as const, prompt, options, correctIndex, answer, explanation }];
+      return [{ kind: 'choice' as const, prompt, options, correctIndex, answer, explanation, topic }];
     }
 
     if (raw.kind === 'short') {
       const answer = typeof raw.answer === 'string' ? raw.answer.trim() : '';
       if (answer.length === 0) return [];
-      return [{ kind: 'short' as const, prompt, options: [], correctIndex: -1, answer, explanation }];
+      return [{ kind: 'short' as const, prompt, options: [], correctIndex: -1, answer, explanation, topic }];
     }
 
     return [];
@@ -378,12 +390,13 @@ export async function generateQuiz(
   material: string,
   count: number,
   signal?: AbortSignal,
+  focusTopics: string[] = [],
 ): Promise<ParsedQuizQuestion[]> {
   const text = await callGemini(
     apiKey,
     {
-      prompt: buildQuizPrompt(material, count),
-      maxOutputTokens: 4096,
+      prompt: buildQuizPrompt(material, count, focusTopics),
+      maxOutputTokens: 8192,
       responseMimeType: 'application/json',
     },
     signal,
