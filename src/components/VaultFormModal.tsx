@@ -1,14 +1,17 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import {
+  MAX_VAULT_SOURCES,
   VAULT_TYPES,
   VAULT_TYPE_HINT,
   VAULT_TYPE_LABEL,
+  combineSources,
   emptyVaultDraft,
+  splitSections,
   type VaultDraft,
   type VaultItem,
   type VaultType,
 } from '../types/vault';
-import { readTextFile } from '../utils/documentLoader';
+import { readTextFile, type LoadedDocument } from '../utils/documentLoader';
 import { TITLE_MAX_LENGTH, validateVaultDraft } from '../utils/validation';
 import { TagInput } from './TagInput';
 import { Button } from './ui/Button';
@@ -25,6 +28,7 @@ export function toVaultDraft(item: VaultItem): VaultDraft {
     urlOrContent: item.urlOrContent,
     type: item.type,
     tags: [...item.tags],
+    sources: (item.sources ?? []).map((source) => ({ ...source })),
   };
 }
 
@@ -47,7 +51,6 @@ export function VaultFormModal({
 }: VaultFormModalProps) {
   const [draft, setDraft] = useState<VaultDraft>(emptyVaultDraft);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [fileName, setFileName] = useState<string | null>(null);
   const [isLoadingFile, setIsLoadingFile] = useState(false);
   const toast = useToast();
 
@@ -55,7 +58,6 @@ export function VaultFormModal({
     if (!open) return;
     setDraft(item ? toVaultDraft(item) : emptyVaultDraft());
     setErrors({});
-    setFileName(null);
     setIsLoadingFile(false);
   }, [open, item]);
 
@@ -80,40 +82,87 @@ export function VaultFormModal({
     submit();
   };
 
-  // A document stores its extracted text, not the binary: that is
-  // what makes the material usable as study context and flashcard
-  // source. The file name only labels the upload.
-  const handleFileChosen = async (file: File) => {
+  // Each file contributes its extracted text (never the binary), under a
+  // "=== nama ===" header so Gemini can tell the files apart.
+  const handleFilesChosen = async (files: File[]) => {
+    const existing = draft.sources ?? [];
+    const room = MAX_VAULT_SOURCES - existing.length;
+    if (room <= 0) {
+      toast({ message: `Maksimal ${MAX_VAULT_SOURCES} berkas per materi.`, tone: 'warning' });
+      return;
+    }
+    if (files.length > room) {
+      toast({
+        message: `Hanya ${room} berkas pertama yang diambil (maks ${MAX_VAULT_SOURCES}).`,
+        tone: 'warning',
+      });
+    }
+
     setIsLoadingFile(true);
-    try {
-      const loaded = await readTextFile(file);
-      // A file is never a URL, so receiving one switches the material
-      // to a document and the extracted text becomes its content.
-      setDraft((current) => ({
+    const loaded: LoadedDocument[] = [];
+    for (const file of files.slice(0, room)) {
+      try {
+        loaded.push(await readTextFile(file));
+      } catch (error) {
+        toast({
+          message: `${file.name}: ${error instanceof Error ? error.message : 'gagal dimuat.'}`,
+          tone: 'error',
+        });
+      }
+    }
+    setIsLoadingFile(false);
+    if (loaded.length === 0) return;
+
+    setDraft((current) => {
+      // A link is an address, not study text, so it is never merged in.
+      const base = current.type === 'link' ? '' : current.urlOrContent.trim();
+      const added = combineSources(loaded);
+      return {
         ...current,
         type: 'document',
-        urlOrContent: loaded.text,
+        urlOrContent: base ? `${base}\n\n${added}` : added,
+        sources: [
+          ...(current.type === 'link' ? [] : (current.sources ?? [])),
+          ...loaded.map((doc) => ({
+            name: doc.name,
+            chars: doc.text.length,
+            ...(doc.pageCount !== undefined ? { pageCount: doc.pageCount } : {}),
+          })),
+        ],
         title:
-          current.title.trim().length === 0
-            ? loaded.name.replace(/\.[^.]+$/, '')
-            : current.title,
-      }));
-      setFileName(loaded.name);
-      toast({ message: `Konten ${loaded.name} berhasil dimuat.`, tone: 'success' });
-    } catch (error) {
+          current.title.trim().length > 0
+            ? current.title
+            : loaded.length === 1
+              ? loaded[0].name.replace(/\.[^.]+$/, '')
+              : 'Kumpulan materi',
+      };
+    });
+    toast({ message: `${loaded.length} berkas dimuat.`, tone: 'success' });
+  };
+
+  const removeSource = (index: number) => {
+    const sources = draft.sources ?? [];
+    const sections = splitSections(draft.urlOrContent);
+    // Only safe while the text still has exactly one section per file.
+    if (sections.length !== sources.length) {
       toast({
-        message: error instanceof Error ? error.message : 'File gagal dimuat.',
-        tone: 'error',
+        message: 'Teks sudah diubah manual. Hapus bagian berkas itu langsung di kolom isi.',
+        tone: 'warning',
       });
-    } finally {
-      setIsLoadingFile(false);
+      return;
     }
+    setDraft((current) => ({
+      ...current,
+      sources: sources.filter((_, i) => i !== index),
+      urlOrContent: sections.filter((_, i) => i !== index).join('\n\n'),
+    }));
   };
 
   // The control follows the type: a link needs a URL field with url
   // validation, while a note or document holds prose — typed or
-  // read out of an uploaded file.
+  // read out of uploaded files.
   const isLink = draft.type === 'link';
+  const sources = draft.sources ?? [];
 
   return (
     <Modal
@@ -176,7 +225,7 @@ export function VaultFormModal({
         />
 
         {/* Uploading is the primary way to save a document, so the
-            pill stays visible on every type; picking a file flips
+            pill stays visible on every type; picking files flips
             the material to a document on its own. */}
         <div className={styles.fileRow}>
           <label className={styles.fileLabel}>
@@ -184,26 +233,49 @@ export function VaultFormModal({
             <span>
               {isLoadingFile
                 ? 'Membaca berkas…'
-                : 'Unggah .txt / .md / .pdf / .docx / .xlsx / .csv'}
+                : `Unggah berkas (${sources.length}/${MAX_VAULT_SOURCES}) — .txt .md .pdf .docx .xlsx .csv`}
             </span>
             <input
               type="file"
+              multiple
               accept=".txt,.md,.pdf,.docx,.xlsx,.csv,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"
               className={styles.fileInput}
+              disabled={isLoadingFile}
               onChange={(event) => {
-                const file = event.target.files?.[0];
-                if (file) void handleFileChosen(file);
+                const files = Array.from(event.target.files ?? []);
+                if (files.length > 0) void handleFilesChosen(files);
                 // Reset so picking the same file twice still fires a change.
                 event.target.value = '';
               }}
             />
           </label>
-          {fileName ? (
-            <span className={styles.fileName} title={fileName}>
-              {fileName}
-            </span>
-          ) : null}
         </div>
+
+        {errors.sources ? (
+          <p className={styles.formError} role="alert">
+            {errors.sources}
+          </p>
+        ) : null}
+
+        {sources.length > 0 ? (
+          <ul className={styles.sourceList}>
+            {sources.map((source, index) => (
+              <li key={`${source.name}-${index}`} className={styles.fileName}>
+                <span title={source.name}>
+                  {source.name}
+                  {source.pageCount ? ` · ${source.pageCount} hlm` : ''}
+                </span>
+                <button
+                  type="button"
+                  aria-label={`Hapus ${source.name}`}
+                  onClick={() => removeSource(index)}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
 
         {isLink ? (
           <Input

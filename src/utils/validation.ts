@@ -1,7 +1,7 @@
 import { isItemType, isTaskPriority, isTaskStatus, type ItemDraft } from '../types/item';
 import type { FlashcardDeckDraft } from '../types/flashcard';
 import type { QuizSetDraft } from '../types/quiz';
-import { isVaultType, type VaultDraft } from '../types/vault';
+import { isVaultType, MAX_VAULT_CHARS, MAX_VAULT_SOURCES, type VaultDraft } from '../types/vault';
 import { CRITICAL_THRESHOLD_MS, inputValueToInstant, inputValueToStorageISO } from './date';
 
 export interface ValidationSuccess {
@@ -154,6 +154,13 @@ export function validateVaultDraft(draft: VaultDraft): VaultResult {
     if (protocol !== null && protocol !== 'http:' && protocol !== 'https:') {
       errors.urlOrContent = 'Tautan harus diawali http:// atau https://';
     }
+  } else if (content.length > MAX_VAULT_CHARS) {
+    errors.urlOrContent = `Teks terlalu besar (maks ${MAX_VAULT_CHARS.toLocaleString('id')} karakter). Kurangi jumlah atau ukuran berkas.`;
+  }
+
+  const sources = draft.type === 'link' ? [] : (draft.sources ?? []);
+  if (sources.length > MAX_VAULT_SOURCES) {
+    errors.sources = `Maksimal ${MAX_VAULT_SOURCES} berkas per materi.`;
   }
 
   if (Object.keys(errors).length > 0) {
@@ -168,6 +175,7 @@ export function validateVaultDraft(draft: VaultDraft): VaultResult {
       urlOrContent: content,
       type: draft.type,
       tags: normalizeTagList(draft.tags),
+      sources,
     },
   };
 }
@@ -234,22 +242,23 @@ export function validateQuizSetDraft(draft: QuizSetDraft): QuizSetResult {
     const explanation = question.explanation.trim();
     if (prompt.length === 0) return [];
 
+    const topic = question.topic?.trim();
+    const extra = topic ? { topic } : {};
+
     if (question.kind === 'choice') {
       const options = question.options
         .map((option) => option.trim())
         .filter((option) => option.length > 0);
-      // The correct answer must survive normalization and still
-      // name one of the options, or the question cannot be scored.
       const answer = question.options[question.correctIndex]?.trim() ?? '';
       const correctIndex = options.findIndex((option) => option === answer);
       return options.length >= 2 && correctIndex !== -1
-        ? [{ kind: 'choice' as const, prompt, options, correctIndex, explanation }]
+        ? [{ kind: 'choice' as const, prompt, options, correctIndex, explanation, ...extra }]
         : [];
     }
 
     const answer = question.answer.trim();
     return answer.length > 0
-      ? [{ kind: 'short' as const, prompt, answer, explanation }]
+      ? [{ kind: 'short' as const, prompt, answer, explanation, ...extra }]
       : [];
   });
 

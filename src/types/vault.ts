@@ -1,3 +1,7 @@
+export const MAX_VAULT_SOURCES = 7;
+/** Batas teks gabungan per materi, supaya LocalStorage (~5 MB) tidak penuh. */
+export const MAX_VAULT_CHARS = 600_000;
+
 export const VAULT_TYPES = ['link', 'note', 'document'] as const;
 
 export type VaultType = (typeof VAULT_TYPES)[number];
@@ -15,6 +19,12 @@ export const VAULT_TYPE_HINT: Record<VaultType, string> = {
   document: 'Tempel teks atau unggah berkas',
 };
 
+export interface VaultSource {
+  name: string;
+  pageCount?: number;
+  chars: number;
+}
+
 /**
  * A saved study material. `urlOrContent` is deliberately a single field: for a
  * link it holds the address, for a note or document the student's own text. One
@@ -30,6 +40,7 @@ export interface VaultItem {
   isRead: boolean;
   /** ISO-8601 UTC. Newest first. */
   createdAt: string;
+  sources?: VaultSource[];
 }
 
 /**
@@ -48,6 +59,7 @@ export interface VaultDraft {
   urlOrContent: string;
   type: VaultType;
   tags: string[];
+  sources?: VaultSource[];
 }
 
 export function isVaultType(value: unknown): value is VaultType {
@@ -56,4 +68,15 @@ export function isVaultType(value: unknown): value is VaultType {
 
 export function emptyVaultDraft(): VaultDraft {
   return { title: '', course: '', urlOrContent: '', type: 'link', tags: [] };
+}
+
+const SECTION_SPLIT = /\n\n(?==== .+ ===\n)/;
+
+/** Setiap berkas diberi header agar Gemini dan truncate() tahu batas antar berkas. */
+export function combineSources(parts: { name: string; text: string }[]): string {
+  return parts.map((p) => `=== ${p.name} ===\n${p.text.trim()}`).join('\n\n');
+}
+
+export function splitSections(content: string): string[] {
+  return content.split(SECTION_SPLIT);
 }
