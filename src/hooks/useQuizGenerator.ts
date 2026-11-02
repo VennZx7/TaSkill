@@ -66,6 +66,7 @@ export function useQuizGenerator() {
   const [apiKey, setApiKeyState] = useState('');
   const [needsKey, setNeedsKey] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationStage, setGenerationStage] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const materials = useMemo<GeneratorMaterial[]>(
@@ -174,12 +175,16 @@ export function useQuizGenerator() {
       let deck: FlashcardDeck | null = null;
 
       if (target !== 'flashcards') {
+        setGenerationStage('Mengirim materi ke Gemini (kuis)…');
         const questions = await generateQuiz(apiKey, material.text, count);
+        setGenerationStage('Menyimpan kuis…');
         quiz = await createQuiz({ title: quizTitle, materialId: material.id || null, questions });
         toast(`Kuis "${quiz.title}" tersimpan dengan ${questions.length} soal.`);
       }
       if (target !== 'quiz') {
+        setGenerationStage('Mengirim materi ke Gemini (flashcards)…');
         const cards = await generateFlashcards(apiKey, material.text, count);
+        setGenerationStage('Menyimpan flashcards…');
         deck = await create({ title: deckTitle, vaultItemId: material.id || null, cards });
         toast(`Deck "${deck.title}" tersimpan dengan ${deck.cards.length} kartu.`);
       }
@@ -193,12 +198,14 @@ export function useQuizGenerator() {
       return null;
     } finally {
       setIsGenerating(false);
+      setGenerationStage('');
     }
   }, [apiKey, count, create, createQuiz, source, target, title, toast]);
 
   return {
     isOpen,
     isGenerating,
+    generationStage,
     error,
     sourceMode,
     setSourceMode,

@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useQuizzes } from '../context/QuizContext';
+import { useUser } from '../context/UserContext';
+import { QUIZ_XP } from '../services/userService';
 import { recordAttempts } from '../services/attemptService';
 import { TaskServiceError } from '../services/errors';
 import type { QuizSet, ShortQuestion } from '../types/quiz';
@@ -32,6 +34,7 @@ function messageOf(error: unknown): string {
 export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
   const toast = useToast();
   const { markStudied } = useQuizzes();
+  const { awardXP } = useUser();
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [selfGrade, setSelfGrade] = useState<Record<string, boolean>>({});
@@ -102,6 +105,14 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
     );
 
     toast(`Kuis selesai. Skor ${score.correct} dari ${score.total}.`);
+    const percent = score.total > 0 ? (score.correct / score.total) * 100 : 0;
+    if (percent > 75) {
+      const result = awardXP(QUIZ_XP);
+      toast(`Lulus kuis! +${QUIZ_XP} XP 🚀`);
+      if (result.leveledUp) {
+        toast(`Naik ke Level ${result.level} — ${result.title}!`);
+      }
+    }
     try {
       await markStudied(quiz.id);
     } catch (caught) {

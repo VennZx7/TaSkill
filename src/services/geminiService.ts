@@ -1,7 +1,7 @@
 import { TaskServiceError } from './errors';
 
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models';
-const MODEL = 'gemini-3.5-flash';
+const MODELS = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-2.5-flash'] as const;
 
 /**
  * The assistant's system instruction: a precise tutor that answers
@@ -157,53 +157,64 @@ async function callGemini(apiKey: string, request: GeminiRequest, signal?: Abort
     throw new TaskServiceError('API Key belum diisi. Tempelkan key Gemini Anda terlebih dahulu.');
   }
 
-  let response: Response;
-  try {
-    response = await fetch(`${ENDPOINT}/${MODEL}:generateContent`, {
-      method: 'POST',
-      // The key travels in a header rather than the query string so it cannot
-      // leak through a URL that gets logged or kept in history.
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({
-        ...(request.systemInstruction
-          ? { systemInstruction: { parts: [{ text: request.systemInstruction }] } }
-          : {}),
-        contents: [{ role: 'user', parts: [{ text: request.prompt }] }],
-        generationConfig: {
-          maxOutputTokens: request.maxOutputTokens,
-          ...(request.responseMimeType ? { responseMimeType: request.responseMimeType } : {}),
-        },
-      }),
-      ...(signal ? { signal } : {}),
-    });
-  } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') throw error;
-    throw new TaskServiceError('Tidak dapat menghubungi Gemini. Periksa koneksi internet Anda.', error);
+  let lastError: TaskServiceError | null = null;
+
+  for (const model of MODELS) {
+    let response: Response;
+    try {
+      response = await fetch(`${ENDPOINT}/${model}:generateContent`, {
+        method: 'POST',
+        // The key travels in a header rather than the query string so it cannot
+        // leak through a URL that gets logged or kept in history.
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+        body: JSON.stringify({
+          ...(request.systemInstruction
+            ? { systemInstruction: { parts: [{ text: request.systemInstruction }] } }
+            : {}),
+          contents: [{ role: 'user', parts: [{ text: request.prompt }] }],
+          generationConfig: {
+            maxOutputTokens: request.maxOutputTokens,
+            ...(request.responseMimeType ? { responseMimeType: request.responseMimeType } : {}),
+          },
+        }),
+        ...(signal ? { signal } : {}),
+      });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') throw error;
+      lastError = new TaskServiceError('Tidak dapat menghubungi Gemini. Periksa koneksi internet Anda.', error);
+      continue;
+    }
+
+    if (!response.ok) {
+      lastError = new TaskServiceError(reasonFrom(response.status, await response.text()));
+      continue;
+    }
+
+    const payload = (await response.json()) as {
+      candidates?: { content?: { parts?: { text?: string }[] } }[];
+      promptFeedback?: { blockReason?: string };
+    };
+
+    const blockReason = payload.promptFeedback?.blockReason;
+    if (blockReason) {
+      lastError = new TaskServiceError(`Permintaan diblokir oleh Gemini (${blockReason}).`);
+      continue;
+    }
+
+    const text = payload.candidates?.[0]?.content?.parts
+      ?.map((part) => part.text ?? '')
+      .join('')
+      .trim();
+
+    if (!text) {
+      lastError = new TaskServiceError('Gemini tidak mengembalikan jawaban. Coba ulangi pertanyaan.');
+      continue;
+    }
+
+    return text;
   }
 
-  if (!response.ok) {
-    throw new TaskServiceError(reasonFrom(response.status, await response.text()));
-  }
-
-  const payload = (await response.json()) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[];
-    promptFeedback?: { blockReason?: string };
-  };
-
-  const blockReason = payload.promptFeedback?.blockReason;
-  if (blockReason) {
-    throw new TaskServiceError(`Permintaan diblokir oleh Gemini (${blockReason}).`);
-  }
-
-  const text = payload.candidates?.[0]?.content?.parts
-    ?.map((part) => part.text ?? '')
-    .join('')
-    .trim();
-
-  if (!text) {
-    throw new TaskServiceError('Gemini tidak mengembalikan jawaban. Coba ulangi pertanyaan.');
-  }
-  return text;
+  throw lastError ?? new TaskServiceError('Gemini tidak dapat merespons. Coba ulangi.');
 }
 
 /** One assistant reply. Returns the text, never the raw payload. */
@@ -342,7 +353,7 @@ export function parseQuizPayload(text: string): ParsedQuizQuestion[] {
     throw new TaskServiceError('Format soal dari Gemini tidak dikenali. Coba ulangi.');
   }
 
-  const questions = parsed.flatMap((entry) => {
+  const questions = parsed.flatMap<ParsedQuizQuestion>((entry) => {
     if (typeof entry !== 'object' || entry === null) return [];
     const raw = entry as Record<string, unknown>;
 

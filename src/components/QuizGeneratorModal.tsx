@@ -3,6 +3,7 @@ import type {
   GeneratorSource,
   GeneratorTarget,
 } from '../hooks/useQuizGenerator';
+import { useEffect, useState } from 'react';
 import type { FlashcardCount } from '../types/flashcard';
 import { MAX_CONTEXT_CHARS } from '../services/geminiService';
 import { Button } from './ui/Button';
@@ -94,6 +95,7 @@ interface QuizGeneratorModalProps {
   onApiKeyChange: (key: string) => void;
   needsKey: boolean;
   isGenerating: boolean;
+  generationStage?: string;
   error: string | null;
   onClose: () => void;
   onSubmit: () => void;
@@ -129,12 +131,26 @@ export function QuizGeneratorModal({
   onApiKeyChange,
   needsKey,
   isGenerating,
+  generationStage,
   error,
   onClose,
   onSubmit,
 }: QuizGeneratorModalProps) {
   const canSubmit =
     source !== null && count > 0 && (needsKey || apiKey.trim().length > 0);
+
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (!isGenerating) {
+      setElapsed(0);
+      return;
+    }
+    const start = Date.now();
+    const id = window.setInterval(() => {
+      setElapsed(Math.floor((Date.now() - start) / 1000));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [isGenerating]);
 
   return (
     <Modal
@@ -164,8 +180,8 @@ export function QuizGeneratorModal({
           <div className={`${shared.skeleton} ${styles.pendingBar}`} />
           <div className={`${shared.skeleton} ${styles.pendingBar}`} />
           <p className={styles.pendingNote}>
-            Gemini sedang menyusun {count} {TARGET_PENDING_LABEL[target]} dari “
-            {source?.title ?? 'materi'}”. Materi dipotong maksimal{' '}
+            {generationStage || 'Gemini sedang menyusun'} {count} {TARGET_PENDING_LABEL[target]} dari “
+            {source?.title ?? 'materi'}”. ({elapsed}s) Materi dipotong maksimal{' '}
             {MAX_CONTEXT_CHARS.toLocaleString('id-ID')} karakter.
           </p>
         </div>

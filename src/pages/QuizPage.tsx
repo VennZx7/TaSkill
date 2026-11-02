@@ -305,6 +305,7 @@ export function QuizView() {
         onApiKeyChange={generator.setApiKey}
         needsKey={generator.needsKey}
         isGenerating={generator.isGenerating}
+        generationStage={generator.generationStage}
         error={generator.error}
         onClose={generator.close}
         onSubmit={() => void handleGenerate()}

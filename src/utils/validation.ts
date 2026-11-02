@@ -237,7 +237,7 @@ export function validateQuizSetDraft(draft: QuizSetDraft): QuizSetResult {
     errors.title = `Judul maksimal ${TITLE_MAX_LENGTH} karakter.`;
   }
 
-  const questions = draft.questions.flatMap((question) => {
+  const questions = (draft.questions as any).flatMap((question: any) => {
     const prompt = question.prompt.trim();
     const explanation = question.explanation.trim();
     if (prompt.length === 0) return [];
@@ -246,11 +246,11 @@ export function validateQuizSetDraft(draft: QuizSetDraft): QuizSetResult {
     const extra = topic ? { topic } : {};
 
     if (question.kind === 'choice') {
-      const options = question.options
-        .map((option) => option.trim())
-        .filter((option) => option.length > 0);
+       const options = question.options
+         .map((option: string) => option.trim())
+         .filter((option: string) => option.length > 0);
       const answer = question.options[question.correctIndex]?.trim() ?? '';
-      const correctIndex = options.findIndex((option) => option === answer);
+       const correctIndex = options.findIndex((option: string) => option === answer);
       return options.length >= 2 && correctIndex !== -1
         ? [{ kind: 'choice' as const, prompt, options, correctIndex, explanation, ...extra }]
         : [];
@@ -260,7 +260,7 @@ export function validateQuizSetDraft(draft: QuizSetDraft): QuizSetResult {
     return answer.length > 0
       ? [{ kind: 'short' as const, prompt, answer, explanation, ...extra }]
       : [];
-  });
+  }) as any;
 
   if (questions.length === 0) {
     errors.questions = 'Kuis harus punya minimal satu soal yang terisi.';

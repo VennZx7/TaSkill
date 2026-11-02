@@ -30,7 +30,6 @@ export function LandingPage({ onEnter }: LandingPageProps) {
             </svg>
           </span>
           <span className={styles.brandName}>TaSkill</span>
-          <span className={styles.brandTag}>Y2K • Glass • Focus</span>
         </div>
         <button type="button" className={styles.enterGhost} onClick={onEnter}>
           Masuk ke App
@@ -62,14 +61,6 @@ export function LandingPage({ onEnter }: LandingPageProps) {
               </button>
             </div>
             <div className={styles.metaRow}>
-              <div className={styles.metaPill}>
-                <span className={styles.metaLabel}>MODE</span>
-                <span className={styles.metaValue}>FOCUS / STUDY</span>
-              </div>
-              <div className={styles.metaPill}>
-                <span className={styles.metaLabel}>UI</span>
-                <span className={styles.metaValue}>GLASSMORPHISM • Y2K</span>
-              </div>
             </div>
           </div>
 
@@ -183,7 +174,6 @@ export function LandingPage({ onEnter }: LandingPageProps) {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <span className={styles.footerBrand}>TaSkill</span>
-          <span className={styles.footerText}>Built for focused study • Y2K glass interface</span>
           <button type="button" className={styles.footerCta} onClick={onEnter}>
             Masuk
           </button>

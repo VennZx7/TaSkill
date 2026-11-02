@@ -1,5 +1,4 @@
 import type { QuizQuestion, QuizSet } from '../types/quiz';
-import { createId } from '../utils/id';
 import { StorageError, readJson, writeJson } from './localStorage';
 import { buildSeedQuizzes } from './quizSeed';
 

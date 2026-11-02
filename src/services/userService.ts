@@ -7,6 +7,7 @@ export const XP_PER_LEVEL = 100;
 /** Rewards, kept next to the profile so callers cannot drift apart. */
 export const TASK_XP = 20;
 export const POMODORO_XP = 10;
+export const QUIZ_XP = 15;
 
 /** RPG titles, one per level; the last title is kept for every level beyond. */
 export const LEVEL_TITLES = [

@@ -91,7 +91,7 @@ describe('generateFlashcards', () => {
     ]);
 
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
-    expect(url).toContain('gemini-3.5-flash');
+    expect(url).toContain('gemini-3.8-flash');
     const headers = init.headers as Record<string, string>;
     expect(headers['x-goog-api-key']).toBe('AIzaTest');
     expect(JSON.parse(String(init.body)).generationConfig.responseMimeType).toBe('application/json');
@@ -136,7 +136,7 @@ describe('askGemini', () => {
     expect(answer).toBe('Jawaban.');
 
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
-    expect(url).toContain('gemini-3.5-flash');
+    expect(url).toContain('gemini-3.8-flash');
     const body = JSON.parse(String(init.body));
     expect(body.systemInstruction.parts[0].text).toBe(TUTOR_SYSTEM_INSTRUCTION);
     expect(body.systemInstruction.parts[0].text).toMatch(/tutor/i);
@@ -167,7 +167,7 @@ describe('summarizeMaterial', () => {
     expect(summary).toBe('Ringkasannya.');
 
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
-    expect(url).toContain('gemini-3.5-flash');
+    expect(url).toContain('gemini-3.8-flash');
     const body = JSON.parse(String(init.body));
     expect(body.systemInstruction.parts[0].text).toBe(TUTOR_SYSTEM_INSTRUCTION);
     expect(body.contents[0].parts[0].text).toMatch(/ringkasan/i);
