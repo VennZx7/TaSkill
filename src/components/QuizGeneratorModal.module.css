@@ -179,13 +179,14 @@
 /* The chroma lives in the border glow of the active tile,
    never as a mask over the label text. */
 .optionActive {
-  border-color: var(--holo-ring);
-  background:
-    var(--sheen),
-    linear-gradient(180deg, var(--accent-soft) 0%, rgb(0 0 0 / 0) 70%),
-    var(--surface-solid);
-  box-shadow: 0 0 0.9rem var(--holo-glow-soft);
+  border: 2px solid var(--ink);
+  background: var(--yellow-soft);
+  box-shadow: var(--shadow-sm);
 }
+
+.option { border: 2px solid var(--ink); border-radius: 14px; background: var(--surface); min-height: 7rem; }
+.option:hover { box-shadow: var(--shadow-sm); }
+.option:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px var(--violet-soft); }
 
 .optionInput {
   position: absolute;

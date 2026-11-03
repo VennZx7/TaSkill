@@ -58,7 +58,9 @@ export function ItemCard({ item, onOpen, onEdit, onDelete, onStatusChange }: Ite
           <span className={styles.typeIcon} aria-label={ITEM_TYPE_LABEL[item.type]} title={ITEM_TYPE_LABEL[item.type]}>
             {item.type === 'exam' ? <CalendarIcon size={16} /> : <DocIcon size={16} />}
           </span>
-          <h3 className={styles.title}>{item.title}</h3>
+          <button type="button" className={styles.titleButton} onClick={() => onOpen(item)} aria-label={`Detail: ${item.title}`}>
+            <span className={styles.title}>{item.title}</span>
+          </button>
         </div>
         <span className={styles.course}>{item.course}</span>
       </div>
@@ -93,18 +95,14 @@ export function ItemCard({ item, onOpen, onEdit, onDelete, onStatusChange }: Ite
           <Badge tone={PRIORITY_TONE[item.priority]}><FlagIcon size={13} />{PRIORITY_LABEL[item.priority]}</Badge>
         </div>
         <div className={styles.actions}>
-          <Button variant="ghost" size="sm" onClick={() => onOpen(item)}>
-            <EyeIcon size={14} />
-            Detail
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => onEdit(item)}>
-            <PencilIcon size={14} />
-            Ubah
-          </Button>
-          <Button variant="subtle" size="sm" onClick={() => onDelete(item)}>
-            <TrashIcon size={14} />
-            Hapus
-          </Button>
+          <details className={styles.menu}>
+            <summary aria-label={`Aksi untuk ${item.title}`} title="Aksi lainnya">…</summary>
+            <div className={styles.menuItems}>
+              <Button variant="ghost" size="sm" onClick={() => onOpen(item)}><EyeIcon size={14} />Detail</Button>
+              <Button variant="ghost" size="sm" onClick={() => onEdit(item)}><PencilIcon size={14} />Ubah</Button>
+              <Button variant="subtle" size="sm" onClick={() => onDelete(item)}><TrashIcon size={14} />Hapus</Button>
+            </div>
+          </details>
         </div>
       </div>
     </article>

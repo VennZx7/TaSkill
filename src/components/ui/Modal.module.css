@@ -15,9 +15,9 @@
   width: 100%;
   max-width: 33rem;
   background: var(--surface-solid);
-  border: 1.5px solid var(--border);
+  border: 2px solid var(--ink);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 8px 8px 0 var(--ink);
   max-height: calc(100vh - 3rem);
   display: flex;
   flex-direction: column;
@@ -28,7 +28,7 @@
   content: '';
   display: block;
   height: 3px;
-  background: var(--primary);
+  background: var(--violet);
   flex-shrink: 0;
 }
 

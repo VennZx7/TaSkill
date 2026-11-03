@@ -2,22 +2,24 @@
 .navbar {
   position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between;
   gap: 1rem; min-height: 4.5rem; padding: 0.65rem clamp(1rem, 3vw, 2.5rem);
-  background: var(--surface); border-bottom: 1.5px solid var(--border);
+  background: var(--surface); border-bottom: 2px solid var(--ink);
 }
 .brand { display: flex; align-items: center; gap: 0.55rem; min-width: 0; }
-.mark { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 0.8rem; color: white; background: var(--primary); }
+.mark { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border: 2px solid var(--ink); border-radius: 0.8rem; color: white; background: var(--violet); box-shadow: 3px 3px 0 var(--ink); transform: rotate(-4deg); }
 .brandText { color: var(--text); font: 900 1.2rem var(--font-heading); }
 .actions { display: flex; align-items: center; gap: 0.65rem; flex-shrink: 0; }
-.streak { display: inline-flex; align-items: center; gap: 0.25rem; border-radius: var(--radius-pill); padding: 0.4rem 0.65rem; background: var(--xp-soft); color: var(--xp-text); font-weight: 800; font-variant-numeric: tabular-nums; }
-.nav { display: flex; align-items: center; gap: 0.25rem; padding: 0.25rem; border-radius: var(--radius-pill); background: var(--bg); }
-.navTab { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 2.75rem; border: 0; border-radius: var(--radius-pill); padding: 0.55rem 0.8rem; background: transparent; color: var(--text-muted); font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: background-color 160ms var(--ease), color 160ms var(--ease), transform 160ms var(--ease); white-space: nowrap; }
-.navTab:hover { color: var(--primary-dark); background: var(--primary-soft); }
-.navTabActive, .navTabActive:hover { background: var(--primary); color: #fff; }
+.streak { display: inline-flex; align-items: center; gap: 0.25rem; border: 2px solid var(--ink); border-radius: var(--radius-pill); padding: 0.4rem 0.65rem; background: var(--orange-soft); color: var(--xp-text); font-weight: 900; font-variant-numeric: tabular-nums; box-shadow: 2px 2px 0 var(--ink); }
+.fire { display: inline-block; animation: fire-pulse 1.5s ease-in-out infinite; }
+@keyframes fire-pulse { 50% { transform: scale(1.16) rotate(-5deg); } }
+.nav { display: flex; align-items: center; gap: 0.25rem; padding: 0.25rem; border: 2px solid var(--ink); border-radius: var(--radius-pill); background: var(--surface); box-shadow: 2px 2px 0 var(--ink); }
+.navTab { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 2.75rem; border: 1.5px solid transparent; border-radius: var(--radius-pill); padding: 0.5rem 0.75rem; background: transparent; color: var(--ink); font-size: 0.875rem; font-weight: 800; cursor: pointer; transition: background-color 150ms var(--ease), color 150ms var(--ease), transform 150ms var(--ease), box-shadow 150ms var(--ease); white-space: nowrap; }
+.navTab:hover { transform: translate(-1px,-1px); background: var(--violet-soft); }
+.navTabActive, .navTabActive:hover { border-color: var(--ink); background: var(--violet); color: #fff; box-shadow: 2px 2px 0 var(--ink); }
 .main { flex: 1; width: 100%; max-width: 78rem; margin: 0 auto; padding: 2rem clamp(1rem, 3vw, 2rem) 3rem; display: flex; flex-direction: column; gap: 1.5rem; }
 @media (max-width: 64rem) {
   .navbar { gap: 0.6rem; }
   .navTab { padding-inline: 0.55rem; font-size: 0.8125rem; }
-  .navTab svg { display: none; }
+  .navTab svg { display: block; }
 }
 @media (max-width: 48rem) {
   .navbar { min-height: 3.75rem; padding: 0.45rem 1rem; }
@@ -25,10 +27,12 @@
   .actions { gap: 0.35rem; }
   .streak { padding: 0.3rem 0.5rem; }
   .main { padding: 1.25rem 1rem 6.5rem; gap: 1.2rem; }
-  .nav { position: fixed; z-index: 30; left: 0.75rem; right: 0.75rem; bottom: max(0.75rem, env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; padding: 0.4rem; border: 1.5px solid var(--border); border-radius: 1.25rem; background: var(--surface); box-shadow: var(--shadow-md); }
+  .nav { position: fixed; z-index: 30; left: 0.75rem; right: 0.75rem; bottom: max(0.75rem, env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; padding: 0.4rem; border: 2px solid var(--ink); border-radius: 1.25rem; background: var(--surface); box-shadow: 4px 4px 0 var(--ink); }
   .navTab { min-height: 3.25rem; display: flex; flex-direction: column; gap: 0.15rem; padding: 0.3rem 0.1rem; border-radius: 0.9rem; font-size: 0.625rem; line-height: 1.15; white-space: normal; }
+  .navTabActive, .navTabActive:hover { box-shadow: 2px 2px 0 var(--ink); }
   .navTab svg { display: block; width: 1.1rem; height: 1.1rem; }
 }
+@media (prefers-reduced-motion: reduce) { .fire { animation: none; } }
 @media (max-width: 23rem) {
   .navbar { flex-wrap: wrap; }
   .brand { flex: 1; }

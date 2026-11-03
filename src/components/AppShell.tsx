@@ -53,7 +53,7 @@ export function AppShell({ module, onNavigate, actions, children }: AppShellProp
 
         <div className={styles.actions}>
           <span className={styles.streak} title="Streak harian">
-            <span aria-hidden="true">🔥</span> {getStreakCount()}
+            <span className={styles.fire} aria-hidden="true">🔥</span> {getStreakCount()}
           </span>
           <LevelMeter level={level} title={title} progress={progress} variant="compact" />
           {actions}

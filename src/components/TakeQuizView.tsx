@@ -60,6 +60,7 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
   }, [answers, choiceQuestions]);
   const scorePercent = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
   const earnedXp = scorePercent > 75 ? QUIZ_XP : 0;
+  const answeredCount = quiz.questions.filter((question) => (answers[question.id] ?? '').trim().length > 0).length;
 
   const setAnswer = (id: string, value: string) =>
     setAnswers((previous) => ({ ...previous, [id]: value }));
@@ -151,6 +152,15 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
           </Button>
         </div>
       </header>
+
+      {!submitted ? (
+        <div className={styles.progressSection}>
+          <div className={styles.progressTrack} role="progressbar" aria-label="Progres kuis" aria-valuemin={0} aria-valuemax={quiz.questions.length} aria-valuenow={answeredCount}>
+            <span style={{ width: `${quiz.questions.length ? (answeredCount / quiz.questions.length) * 100 : 0}%` }} />
+          </div>
+          <span className={styles.progressLabel}>{answeredCount}/{quiz.questions.length} soal terjawab</span>
+        </div>
+      ) : null}
 
       {submitted ? (
         <div

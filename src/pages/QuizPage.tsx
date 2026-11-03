@@ -177,6 +177,13 @@ export function QuizView() {
       <StudyModeView deck={activeDeck} onExit={() => setStudying(null)} />
     ) : (
       <>
+        <header className={styles.pageHeader}>
+          <span className={styles.pageSticker}><CardsIcon size={25} /></span>
+          <div>
+            <h1 className={styles.pageTitle}>Kuis &amp; Kartu Flash</h1>
+            <p className={styles.pageDescription}>Latihan dari materi kuliahmu, disusun untuk menguatkan ingatan.</p>
+          </div>
+        </header>
         <div className={styles.toolbar}>
           <div className={styles.tabs} role="group" aria-label="Koleksi">
             {TABS.map(({ value, label, Icon }) => {
@@ -196,7 +203,7 @@ export function QuizView() {
               );
             })}
           </div>
-          <Button variant="primary" aria-label="Generate Flashcards dengan AI" onClick={() => generator.open()}>
+          <Button className={styles.aiButton} variant="primary" aria-label="Generate Flashcards dengan AI" onClick={() => generator.open()}>
             <SparkleIcon size={16} />
             Buat dengan AI
           </Button>

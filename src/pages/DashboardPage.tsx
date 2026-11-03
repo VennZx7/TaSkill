@@ -31,9 +31,9 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
     <>
       <div className={styles.hero}>
         <div>
-          <h2 className={styles.heading}>Ringkasan Kuliah</h2>
+          <h2 className={styles.heading} aria-label="Ringkasan Kuliah">Misi hari ini</h2>
           <p className={styles.subheading}>
-            Apa yang perlu dicermati hari ini, lintas tugas, ujian, dan materi Study Vault.
+            Pilih langkah berikutnya untuk tugas, ujian, dan materi belajarmu.
           </p>
         </div>
       </div>

@@ -2,7 +2,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  border: 1.5px solid transparent;
+  border: 1.5px solid var(--ink);
   border-radius: var(--radius-pill);
   padding: 0.25rem 0.7rem;
   font-size: 0.8125rem;
@@ -22,30 +22,30 @@
 
 .neutral {
   background: var(--surface-muted);
-  border-color: var(--border);
-  color: var(--text-muted);
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .danger {
   background: var(--danger-soft);
-  border-color: var(--danger-border);
+  border-color: var(--ink);
   color: var(--danger-text);
 }
 
 .success {
   background: var(--success-soft);
-  border-color: var(--success-border);
+  border-color: var(--ink);
   color: var(--success-text);
 }
 
 .warning {
   background: var(--warning-soft);
-  border-color: var(--warning-border);
+  border-color: var(--ink);
   color: var(--warning-text);
 }
 
 .accent {
-  background: var(--primary-soft);
-  border-color: var(--border);
-  color: var(--primary-dark);
+  background: var(--violet-soft);
+  border-color: var(--ink);
+  color: var(--ink);
 }

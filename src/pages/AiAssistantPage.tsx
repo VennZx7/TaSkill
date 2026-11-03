@@ -1,5 +1,6 @@
 import { AiAssistantView } from '../components/AiAssistantView';
 import { useAiAssistant } from '../hooks/useAiAssistant';
+import { SparkleIcon } from '../components/ui/icons';
 import styles from './AiAssistantPage.module.css';
 
 export function AiAssistantPage() {
@@ -10,12 +11,11 @@ export function AiAssistantPage() {
     // API key block stays put.
     <div className={styles.page}>
       <div className={styles.intro}>
-        <h2 className={styles.heading}>AI Study Assistant</h2>
-        <p className={styles.subheading}>
-          Tanya Gemini tentang materi pilihanmu. Konteks dikirim bersama pertanyaan, jadi
-          jawabannya spesifik pada catatanmu, bukan umum. Tekan tombol Rangkum untuk
-          ringkasan otomatis dari materi yang sedang dimuat.
-        </p>
+        <span className={styles.sticker}><SparkleIcon size={28} /></span>
+        <div>
+          <h2 className={styles.heading}>Asisten AI</h2>
+          <p className={styles.subheading}>Tanya materi kuliahmu atau minta rangkuman dari Gemini.</p>
+        </div>
       </div>
 
       <AiAssistantView

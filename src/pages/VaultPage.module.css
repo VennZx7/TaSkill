@@ -12,6 +12,9 @@
   letter-spacing: -0.02em;
 }
 
+.heading{font-size:clamp(2rem,4vw,2.75rem);font-weight:900;letter-spacing:0;color:var(--ink)}
+.toolbar>div:first-child{padding:1rem 1.15rem;background:var(--sky-soft);border:2px solid var(--ink);border-radius:16px;box-shadow:var(--shadow)}.subheading{font-size:.95rem;color:var(--ink-2);margin-top:.25rem}
+
 .subheading {
   font-size: 0.8125rem;
   color: var(--text-muted);

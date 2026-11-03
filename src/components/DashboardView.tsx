@@ -16,6 +16,7 @@ const UNREAD_ACCENT = 'var(--rail-default)';
 
 interface PanelProps {
   label: string;
+  ariaLabel?: string;
   count: number;
   accent: string;
   alert?: boolean;
@@ -24,16 +25,16 @@ interface PanelProps {
 }
 
 /** One titled section. Rows render inside; the panel owns the header and action. */
-function Panel({ label, count, accent, alert = false, action, children }: PanelProps) {
+function Panel({ label, ariaLabel, count, accent, alert = false, action, children }: PanelProps) {
   return (
     <section
       className={styles.panel}
-      aria-label={label}
+      aria-label={ariaLabel ?? label}
       style={{ '--accent': accent } as CSSProperties}
     >
       <header className={styles.header}>
         <div>
-          <h2 className={styles.label}>{label}</h2>
+          <h2 className={styles.label} aria-label={ariaLabel ?? label}>{label}</h2>
           <span className={`${styles.count} ${alert ? styles.countAlert : ''}`}>{count}</span>
         </div>
         {action}
@@ -80,7 +81,8 @@ export function DashboardView({
 
       <div className={styles.grid}>
         <Panel
-          label="Tenggat Waktu Dekat"
+          label="Kejar sebelum telat"
+          ariaLabel="Tenggat Waktu Dekat"
           count={itemStats.urgent.length}
           accent={URGENT_ACCENT}
           alert={itemStats.urgent.some((item) => item.status !== 'Done')}

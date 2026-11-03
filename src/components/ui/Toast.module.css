@@ -13,10 +13,10 @@
   display: flex;
   align-items: flex-start;
   gap: 0.6rem;
-  border: 1.5px solid var(--border);
+  border: 2px solid var(--ink);
   border-radius: var(--radius);
   background: var(--surface-solid);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow);
   padding: 0.65rem 0.85rem;
   font-size: 0.9375rem;
   animation: slide-in 0.22s ease;

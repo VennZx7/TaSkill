@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react';
 import { formatClock, type PomodoroMode } from '../hooks/usePomodoro';
 import { Button } from './ui/Button';
 import { PauseIcon, PlayIcon, RefreshIcon } from './ui/icons';
@@ -82,8 +81,11 @@ export function PomodoroView({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress * 100)}
-          style={{ '--progress': `${Math.max(0, Math.min(1, progress)) * 100}%` } as CSSProperties}
         >
+          <svg className={styles.progressSvg} viewBox="0 0 220 220" aria-hidden="true">
+            <circle className={styles.progressTrack} cx="110" cy="110" r="98" />
+            <circle className={styles.progressFill} cx="110" cy="110" r="98" strokeDasharray={`${2 * Math.PI * 98}`} strokeDashoffset={`${2 * Math.PI * 98 * (1 - Math.max(0, Math.min(1, progress)))}`} />
+          </svg>
           <div className={styles.clock} aria-live="off" role="timer" aria-label={`${remaining} detik tersisa`}>
             {formatClock(remaining)}
           </div>

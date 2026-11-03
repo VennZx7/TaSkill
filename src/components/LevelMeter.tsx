@@ -22,7 +22,7 @@ export function LevelMeter({
       role="group"
       aria-label={`Level ${level} — ${title}`}
     >
-      <span className={styles.badge} aria-hidden="true">
+      <span key={level} className={styles.badge} aria-hidden="true">
         Lv {level}
       </span>
       <span className={styles.title}>{title}</span>

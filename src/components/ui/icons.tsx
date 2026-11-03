@@ -269,6 +269,15 @@ export function FlagIcon({ size = 14, className }: IconProps) {
   );
 }
 
+export function KeyIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="8" cy="15" r="4" />
+      <path d="m11 12 8-8 2 2-2 2 2 2-3 3-2-2-3 3" />
+    </svg>
+  );
+}
+
 /** Two stacked cards: the flashcard deck. */
 export function CardsIcon({ size = 16, className }: IconProps) {
   return (

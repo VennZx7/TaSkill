@@ -12,6 +12,8 @@
   letter-spacing: -0.02em;
 }
 
+.toolbar{padding:1rem 1.15rem;background:var(--violet-soft);border:2px solid var(--ink);border-radius:16px;box-shadow:var(--shadow)}.heading{font-size:clamp(1.8rem,3vw,2.5rem);font-weight:900;letter-spacing:0;color:var(--ink)}
+
 .toolbarActions {
   display: flex;
   align-items: center;

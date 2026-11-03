@@ -3,7 +3,7 @@ import { MAX_CONTEXT_CHARS } from '../services/geminiService';
 import type { ChatMessage } from '../hooks/useAiAssistant';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
-import { ListIcon, NoteIcon, SendIcon, SparkleIcon, UploadIcon } from './ui/icons';
+import { KeyIcon, NoteIcon, SendIcon, SparkleIcon, UploadIcon } from './ui/icons';
 import styles from './AiAssistantView.module.css';
 
 interface SelectableItem {
@@ -63,12 +63,10 @@ export function AiAssistantView({
   return (
     <div className={styles.root}>
       <section className={styles.setup}>
-        <h3 className={styles.setupTitle}>Sumber Materi</h3>
+        <h3 className={styles.setupTitle}><span className={styles.sectionSticker}><NoteIcon size={19} /></span>Sumber Materi</h3>
         <div className={styles.setupRow}>
           <div className={styles.setupField}>
-            <label className={styles.label} htmlFor="gemini-key">
-              Gemini API Key
-            </label>
+            <label className={styles.label} htmlFor="gemini-key"><KeyIcon size={16} /> Gemini API Key</label>
             <input
               id="gemini-key"
               className={styles.input}
@@ -152,11 +150,12 @@ export function AiAssistantView({
               <Button
               variant="primary"
               size="sm"
+              className={styles.summarize}
               onClick={onSummarize}
               disabled={isThinking}
               title="Buat ringkasan otomatis dari materi ini"
             >
-              <ListIcon size={14} />
+              <SparkleIcon size={16} />
               Rangkum
             </Button>
             <Button variant="ghost" size="sm" onClick={onClearContext}>
@@ -192,6 +191,7 @@ export function AiAssistantView({
                   message.role === 'user' ? styles.fromUser : styles.fromAssistant
                 }`}
               >
+                {message.role === 'assistant' ? <span className={styles.avatar} aria-label="Gemini"><SparkleIcon size={15} /></span> : null}
                 <span className={styles.bubble}>{message.text}</span>
               </article>
             ))
@@ -199,12 +199,14 @@ export function AiAssistantView({
 
           {isThinking ? (
             <article className={`${styles.message} ${styles.fromAssistant}`}>
+              <span className={styles.avatar} aria-hidden="true"><SparkleIcon size={15} /></span>
               <span className={styles.bubble}>
                 <span className={styles.typing} aria-label="Gemini sedang menjawab">
                   <span className={styles.dot} />
                   <span className={styles.dot} />
                   <span className={styles.dot} />
                 </span>
+                <span className={styles.thinkingText}>Gemini sedang membaca materimu...</span>
               </span>
             </article>
           ) : null}

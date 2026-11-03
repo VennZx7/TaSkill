@@ -84,14 +84,13 @@ export function VaultCard({ item, onEdit, onDelete, onToggleRead }: VaultCardPro
             <CheckIcon size={14} />
             {item.isRead ? 'Tandai belum' : 'Tandai dibaca'}
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => onEdit(item)}>
-            <PencilIcon size={14} />
-            Ubah
-          </Button>
-          <Button variant="subtle" size="sm" onClick={() => onDelete(item)}>
-            <TrashIcon size={14} />
-            Hapus
-          </Button>
+          <details className={styles.menu}>
+            <summary aria-label={`Aksi untuk ${item.title}`} title="Aksi lainnya">…</summary>
+            <div className={styles.menuItems}>
+              <Button variant="ghost" size="sm" onClick={() => onEdit(item)}><PencilIcon size={14} />Ubah</Button>
+              <Button variant="subtle" size="sm" onClick={() => onDelete(item)}><TrashIcon size={14} />Hapus</Button>
+            </div>
+          </details>
         </div>
       </footer>
     </article>
