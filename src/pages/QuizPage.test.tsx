@@ -45,6 +45,9 @@ function geminiFetch(text: string) {
 }
 
 async function openFlashcards(user: ReturnType<typeof userEvent.setup>) {
+  const start = screen.queryByRole('button', { name: 'Mulai Sekarang' });
+  if (start) await user.click(start);
+  await user.click(await screen.findByRole('button', { name: 'Quiz' }));
   await user.click(await screen.findByRole('button', { name: 'Flashcards' }));
   await screen.findByRole('heading', { name: 'Flashcards' });
 }
@@ -53,7 +56,8 @@ async function openFlashcards(user: ReturnType<typeof userEvent.setup>) {
  *  the select yet on the first try. */
 async function pickNote(user: ReturnType<typeof userEvent.setup>) {
   await screen.findByRole('option', { name: /Catatan Bab 1/ });
-  await user.selectOptions(screen.getByLabelText(/Materi sumber/), 'v1');
+  await user.selectOptions(screen.getByLabelText(/Materi dari Study Vault/), 'v1');
+  await user.click(screen.getByRole('radio', { name: /Generate Flashcards/ }));
 }
 
 beforeEach(() => {

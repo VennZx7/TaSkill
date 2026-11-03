@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { formatClock, type PomodoroMode } from '../hooks/usePomodoro';
 import { Button } from './ui/Button';
 import { PauseIcon, PlayIcon, RefreshIcon } from './ui/icons';
@@ -74,19 +75,18 @@ export function PomodoroView({
       <div className={styles.clockWrap}>
         <span className={styles.modeTitle}>{MODE_TITLE[mode]}</span>
         {/* aria-live off: announcing every second would flood a screen reader. */}
-        <div className={styles.clock} aria-live="off" role="timer" aria-label={`${remaining} detik tersisa`}>
-          {formatClock(remaining)}
-        </div>
-
         <div
-          className={styles.track}
+          className={styles.clockRing}
           role="progressbar"
           aria-label="Kemajuan sesi"
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress * 100)}
+          style={{ '--progress': `${Math.max(0, Math.min(1, progress)) * 100}%` } as CSSProperties}
         >
-          <span className={styles.fill} style={{ width: `${Math.max(0, Math.min(1, progress)) * 100}%` }} />
+          <div className={styles.clock} aria-live="off" role="timer" aria-label={`${remaining} detik tersisa`}>
+            {formatClock(remaining)}
+          </div>
         </div>
 
         <div className={styles.controls}>

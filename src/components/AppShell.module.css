@@ -1,189 +1,37 @@
-.shell {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Sticky, translucent bar with a hairline bottom edge instead of a shadow. */
+.shell { min-height: 100vh; display: flex; flex-direction: column; }
 .navbar {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.7rem clamp(1rem, 4vw, 2rem);
-  background: var(--surface);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; min-height: 4.5rem; padding: 0.65rem clamp(1rem, 3vw, 2.5rem);
+  background: var(--surface); border-bottom: 1.5px solid var(--border);
 }
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  min-width: 0;
+.brand { display: flex; align-items: center; gap: 0.55rem; min-width: 0; }
+.mark { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 0.8rem; color: white; background: var(--primary); }
+.brandText { color: var(--text); font: 900 1.2rem var(--font-heading); }
+.actions { display: flex; align-items: center; gap: 0.65rem; flex-shrink: 0; }
+.streak { display: inline-flex; align-items: center; gap: 0.25rem; border-radius: var(--radius-pill); padding: 0.4rem 0.65rem; background: var(--xp-soft); color: var(--xp-text); font-weight: 800; font-variant-numeric: tabular-nums; }
+.nav { display: flex; align-items: center; gap: 0.25rem; padding: 0.25rem; border-radius: var(--radius-pill); background: var(--bg); }
+.navTab { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 2.75rem; border: 0; border-radius: var(--radius-pill); padding: 0.55rem 0.8rem; background: transparent; color: var(--text-muted); font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: background-color 160ms var(--ease), color 160ms var(--ease), transform 160ms var(--ease); white-space: nowrap; }
+.navTab:hover { color: var(--primary-dark); background: var(--primary-soft); }
+.navTabActive, .navTabActive:hover { background: var(--primary); color: #fff; }
+.main { flex: 1; width: 100%; max-width: 78rem; margin: 0 auto; padding: 2rem clamp(1rem, 3vw, 2rem) 3rem; display: flex; flex-direction: column; gap: 1.5rem; }
+@media (max-width: 64rem) {
+  .navbar { gap: 0.6rem; }
+  .navTab { padding-inline: 0.55rem; font-size: 0.8125rem; }
+  .navTab svg { display: none; }
 }
-
-/* Chrome badge: the brand mark sits on real metal, edged with the iridescent
-   hairline, so the identity reads at a glance without a coloured background
-   fighting the navbar text. */
-.mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 2.1rem;
-  height: 2.1rem;
-  border-radius: 0.7rem;
-  color: var(--text);
-  background: var(--chrome);
-  border: 1px solid var(--holo-ring);
-  box-shadow:
-    var(--shadow-sm),
-    inset 0 1px 0 rgb(255 255 255 / 60%),
-    0 0 0.7rem var(--holo-glow-soft);
+@media (max-width: 48rem) {
+  .navbar { min-height: 3.75rem; padding: 0.45rem 1rem; }
+  .brandText { font-size: 1.05rem; }
+  .actions { gap: 0.35rem; }
+  .streak { padding: 0.3rem 0.5rem; }
+  .main { padding: 1.25rem 1rem 6.5rem; gap: 1.2rem; }
+  .nav { position: fixed; z-index: 30; left: 0.75rem; right: 0.75rem; bottom: max(0.75rem, env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; padding: 0.4rem; border: 1.5px solid var(--border); border-radius: 1.25rem; background: var(--surface); box-shadow: var(--shadow-md); }
+  .navTab { min-height: 3.25rem; display: flex; flex-direction: column; gap: 0.15rem; padding: 0.3rem 0.1rem; border-radius: 0.9rem; font-size: 0.625rem; line-height: 1.15; white-space: normal; }
+  .navTab svg { display: block; width: 1.1rem; height: 1.1rem; }
 }
-
-.brandText {
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  background: var(--brand-grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  /* --brand-shadow is a single shadow because it lands inside one drop-shadow(). */
-  filter: drop-shadow(var(--brand-shadow));
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
-/* Segmented module switch. Sits between brand and actions on desktop; at 360px
-   the brand text collapses so the two tabs keep comfortable touch targets. */
-.nav {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.15rem;
-  padding: 0.2rem;
-  background: var(--surface-muted);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  box-shadow: inset 0 1px 2px rgb(0 0 0 / 4%);
-  flex-shrink: 0;
-}
-
-.navTab {
-  position: relative;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: -0.005em;
-  padding: 0.4rem 0.85rem;
-  cursor: pointer;
-  white-space: nowrap;
-  transition:
-    background-color 0.2s var(--ease),
-    color 0.2s var(--ease),
-    box-shadow 0.2s var(--ease);
-}
-
-.navTab:hover {
-  color: var(--text);
-}
-
-.navTab:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 1px;
-}
-
-.navTabActive {
-  background: var(--chrome);
-  color: var(--text);
-  box-shadow:
-    var(--shadow-sm),
-    inset 0 1px 0 rgb(255 255 255 / 60%);
-}
-
-.navTabActive:hover {
-  color: var(--text);
-}
-
-/* Iridescent rail under the active tab. It carries the same identity as the
-   wordmark and costs one gradient, no layout shift. */
-.navTabActive::after {
-  content: '';
-  position: absolute;
-  left: 35%;
-  right: 35%;
-  bottom: -0.15rem;
-  height: 2px;
-  border-radius: var(--radius-pill);
-  background: var(--holo-grad);
-}
-
-.main {
-  flex: 1;
-  width: 100%;
-  max-width: 68rem;
-  margin: 0 auto;
-  padding: 1.5rem clamp(1rem, 4vw, 2rem) 4rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.15rem;
-}
-
-@media (max-width: 34rem) {
-  .brandText {
-    font-size: 0.95rem;
-  }
-}
-
-/* Below ~640px the brand, the tabs, and two actions cannot share one row
-   without the tabs shrinking to nothing, so the nav wraps to its own line.
-   Six tabs need a grid rather than one scrolling row: three columns of equal
-   width keeps every label readable at 360px with no horizontal scroll. */
-@media (max-width: 40rem) {
-  .navbar {
-    flex-wrap: wrap;
-    row-gap: 0.6rem;
-  }
-
-  .brand {
-    flex: 1 1 auto;
-  }
-
-  .nav {
-    order: 3;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.15rem;
-    width: 100%;
-    border-radius: var(--radius);
-  }
-
-  .navTab {
-    font-size: 0.75rem;
-    padding: 0.45rem 0.35rem;
-    text-align: center;
-  }
-}
-
-/* At 360px even three columns squeeze "Study Vault", so the grid drops to two. */
-@media (max-width: 26rem) {
-  .nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+@media (max-width: 23rem) {
+  .navbar { flex-wrap: wrap; }
+  .brand { flex: 1; }
+  .actions { flex: 1 1 auto; justify-content: flex-end; }
+  .nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }

@@ -1,126 +1,30 @@
 .button {
   display: inline-flex;
+  min-height: 2.75rem;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  padding: 0.5rem 1.05rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+  gap: 0.5rem;
+  border: 1.5px solid var(--border);
+  border-radius: 0.875rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
   cursor: pointer;
-  /* One curve and one duration for every state, so a press never outruns the
-     hover that preceded it. Properties are listed, never `all`. */
-  transition:
-    transform 0.2s var(--ease),
-    box-shadow 0.2s var(--ease),
-    background-color 0.2s var(--ease),
-    border-color 0.2s var(--ease),
-    color 0.2s var(--ease);
+  transition: transform 160ms var(--ease), box-shadow 160ms var(--ease), background-color 160ms var(--ease), border-color 160ms var(--ease), color 160ms var(--ease);
   white-space: nowrap;
 }
-
-.button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.button:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-}
-
-.button svg {
-  flex-shrink: 0;
-}
-
-.button:not(:disabled):hover {
-  transform: translateY(-1px);
-}
-
-.button:not(:disabled):active {
-  transform: translateY(0);
-}
-
-/* Glossy primary: a black-to-silver gradient with a specular highlight on top.
-   Deliberately monochrome — the chromatic accents belong to the brand and the
-   dashboard, and a rainbow button would lose the label's contrast. */
-.primary {
-  border-color: transparent;
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.4) 0%, rgb(255 255 255 / 0) 52%),
-    var(--accent-grad);
-  color: var(--primary-label);
-  box-shadow:
-    0 2px 10px var(--accent-glow),
-    inset 0 1px 0 rgb(255 255 255 / 28%);
-  transition:
-    transform 0.2s var(--ease),
-    box-shadow 0.2s var(--ease);
-}
-
-.primary:hover:not(:disabled) {
-  box-shadow:
-    0 6px 18px var(--accent-glow),
-    0 0 0.9rem var(--holo-glow-soft),
-    inset 0 1px 0 rgb(255 255 255 / 28%);
-}
-
-.secondary {
-  background: var(--chrome);
-  color: var(--text);
-  box-shadow:
-    var(--shadow-sm),
-    inset 0 1px 0 rgb(255 255 255 / 90%);
-  transition:
-    transform 0.2s var(--ease),
-    box-shadow 0.2s var(--ease),
-    border-color 0.2s var(--ease);
-}
-
-.secondary:hover:not(:disabled) {
-  border-color: var(--holo-ring);
-  box-shadow:
-    var(--shadow),
-    inset 0 1px 0 rgb(255 255 255 / 90%);
-}
-
-.ghost {
-  background: transparent;
-  border-color: transparent;
-  color: var(--text-muted);
-  padding: 0.4rem 0.7rem;
-}
-
-.ghost:hover:not(:disabled) {
-  background: var(--accent-soft);
-  color: var(--text);
-}
-
-.subtle {
-  background: transparent;
-  border-color: transparent;
-  color: var(--danger-text);
-  padding: 0.4rem 0.7rem;
-}
-
-.subtle:hover:not(:disabled) {
-  background: var(--danger-soft);
-}
-
-.danger {
-  border-color: transparent;
-  background: linear-gradient(180deg, #fb7185 0%, #e11d48 100%);
-  color: #fff;
-  box-shadow: 0 2px 10px rgb(225 29 72 / 30%);
-}
-
-.danger:hover:not(:disabled) {
-  box-shadow: 0 6px 18px rgb(225 29 72 / 38%);
-}
-
-.sm {
-  padding: 0.32rem 0.7rem;
-  font-size: 0.8125rem;
-}
+.button:disabled { opacity: 0.55; cursor: not-allowed; }
+.button svg { flex: 0 0 auto; }
+.button:not(:disabled):hover { transform: translateY(-1px); }
+.button:not(:disabled):active { transform: translateY(3px); }
+.primary { border-color: var(--primary); background: var(--primary); color: var(--on-primary); box-shadow: 0 4px 0 var(--primary-dark); }
+.primary:hover:not(:disabled) { background: var(--primary-dark); box-shadow: 0 5px 0 #3528b7; }
+.primary:active:not(:disabled) { box-shadow: 0 1px 0 var(--primary-dark); }
+.secondary { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+.secondary:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-soft); }
+.ghost { border-color: transparent; background: transparent; color: var(--text-muted); }
+.ghost:hover:not(:disabled) { background: var(--primary-soft); color: var(--primary-dark); }
+.subtle { border-color: transparent; background: var(--danger-soft); color: var(--danger-text); }
+.subtle:hover:not(:disabled), .danger:hover:not(:disabled) { background: #fecaca; }
+.danger { border-color: var(--danger-soft); background: var(--danger-soft); color: var(--danger-text); }
+.sm { min-height: 2.5rem; padding: 0.45rem 0.75rem; font-size: 0.8125rem; }

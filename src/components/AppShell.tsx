@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useUser } from '../context/UserContext';
 import { LevelMeter } from './LevelMeter';
 import { getStreakCount } from '../services/streakService';
-import { BrandMarkIcon } from './ui/icons';
+import { BrandMarkIcon, CalendarIcon, CardsIcon, PlayIcon, SparkleIcon, VaultIcon } from './ui/icons';
 import styles from './AppShell.module.css';
 
 export type Module = 'dashboard' | 'scheduler' | 'vault' | 'pomodoro' | 'ai' | 'flashcards';
@@ -14,13 +14,13 @@ interface AppShellProps {
   children: ReactNode;
 }
 
-const TABS: { value: Module; label: string }[] = [
-  { value: 'dashboard', label: 'Beranda' },
-  { value: 'scheduler', label: 'Jadwal' },
-  { value: 'vault', label: 'Study Vault' },
-  { value: 'pomodoro', label: 'Focus' },
-  { value: 'ai', label: 'AI Assistant' },
-  { value: 'flashcards', label: 'Quiz' },
+const TABS: { value: Module; label: string; Icon: typeof BrandMarkIcon }[] = [
+  { value: 'dashboard', label: 'Beranda', Icon: BrandMarkIcon },
+  { value: 'scheduler', label: 'Jadwal', Icon: CalendarIcon },
+  { value: 'vault', label: 'Study Vault', Icon: VaultIcon },
+  { value: 'pomodoro', label: 'Focus', Icon: PlayIcon },
+  { value: 'ai', label: 'AI Assistant', Icon: SparkleIcon },
+  { value: 'flashcards', label: 'Quiz', Icon: CardsIcon },
 ];
 
 export function AppShell({ module, onNavigate, actions, children }: AppShellProps) {
@@ -45,6 +45,7 @@ export function AppShell({ module, onNavigate, actions, children }: AppShellProp
               aria-current={module === tab.value ? 'page' : undefined}
               onClick={() => onNavigate(tab.value)}
             >
+              <tab.Icon size={16} />
               {tab.label}
             </button>
           ))}
@@ -52,7 +53,7 @@ export function AppShell({ module, onNavigate, actions, children }: AppShellProp
 
         <div className={styles.actions}>
           <span className={styles.streak} title="Streak harian">
-            🔥 {getStreakCount()}
+            <span aria-hidden="true">🔥</span> {getStreakCount()}
           </span>
           <LevelMeter level={level} title={title} progress={progress} variant="compact" />
           {actions}

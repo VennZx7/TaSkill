@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { AppShell, type Module } from './components/AppShell';
 import { Button } from './components/ui/Button';
-import { ThemeToggle } from './components/ui/ThemeToggle';
 import { ToastProvider } from './components/ui/Toast';
 import { FlashcardProvider } from './context/FlashcardContext';
 import { ItemProvider } from './context/ItemContext';
 import { QuizProvider } from './context/QuizContext';
 import { UserProvider } from './context/UserContext';
 import { VaultProvider } from './context/VaultContext';
-import { useTheme } from './hooks/useTheme';
 import { DashboardPage } from './pages/DashboardPage';
 import { TaskPage } from './pages/HomePage';
 import { PomodoroPage } from './pages/PomodoroPage';
@@ -23,7 +21,6 @@ import { LandingPage } from './pages/landing/LandingPage';
  */
 function Workspace({ onExit }: { onExit: () => void }) {
   const [module, setModule] = useState<Module>('dashboard');
-  const { theme, toggle } = useTheme();
 
   return (
     <AppShell
@@ -34,7 +31,6 @@ function Workspace({ onExit }: { onExit: () => void }) {
           <Button variant="ghost" size="sm" onClick={onExit}>
             ← Kembali
           </Button>
-          <ThemeToggle theme={theme} onToggle={toggle} />
         </>
       }
     >

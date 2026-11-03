@@ -34,8 +34,8 @@ for (const stat of weakTopics()) {
 type QuizTab = 'quizzes' | 'flashcards';
 
 const TABS: { value: QuizTab; label: string; Icon: typeof ListIcon }[] = [
-  { value: 'quizzes', label: 'My Quizzes', Icon: ListIcon },
-  { value: 'flashcards', label: 'My Flashcards', Icon: CardsIcon },
+  { value: 'quizzes', label: 'Kuis Saya', Icon: ListIcon },
+  { value: 'flashcards', label: 'Kartu Flash', Icon: CardsIcon },
 ];
 
 function messageOf(error: unknown): string {
@@ -185,6 +185,7 @@ export function QuizView() {
                 <button
                   key={value}
                   type="button"
+                  aria-label={value === 'flashcards' ? 'Flashcards' : undefined}
                   aria-pressed={active}
                   className={`${styles.tab} ${active ? styles.tabActive : ''}`.trim()}
                   onClick={() => setTab(value)}
@@ -195,16 +196,16 @@ export function QuizView() {
               );
             })}
           </div>
-          <Button variant="primary" onClick={() => generator.open()}>
+          <Button variant="primary" aria-label="Generate Flashcards dengan AI" onClick={() => generator.open()}>
             <SparkleIcon size={16} />
-            Generate dengan AI
+            Buat dengan AI
           </Button>
         </div>
 
         {tab === 'quizzes' ? (
           <section className={styles.panel}>
             <div className={styles.panelHead}>
-              <h2 className={styles.heading}>My Quizzes</h2>
+              <h2 className={styles.heading}>Kuis Saya</h2>
               <p className={styles.subheading}>
                 Kuis pilihan ganda dan jawaban singkat. Pilihan ganda
                 dinilai otomatis; jawaban singkat diperiksa sendiri.
@@ -248,7 +249,7 @@ export function QuizView() {
         ) : (
           <section className={styles.panel}>
             <div className={styles.panelHead}>
-              <h2 className={styles.heading}>Flashcards</h2>
+              <h2 className={styles.heading} aria-label="Flashcards">Kartu Flash</h2>
               <p className={styles.subheading}>
                 Deck tanya-jawab dari materi Study Vault. Klik deck untuk
                 mulai belajar.

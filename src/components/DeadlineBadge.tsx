@@ -1,5 +1,5 @@
 import type { TaskStatus } from '../types/item';
-import { formatRemaining, formatToWIB, getUrgency, INVALID_DATE_LABEL } from '../utils/date';
+import { formatDeadlineLabel, formatToWIB, getUrgency, INVALID_DATE_LABEL } from '../utils/date';
 import { Badge, type BadgeTone } from './ui/Badge';
 import styles from './DeadlineBadge.module.css';
 
@@ -31,9 +31,11 @@ export function DeadlineBadge({ deadline, status, now = Date.now() }: DeadlineBa
   return (
     <span className={styles.wrapper}>
       <Badge tone={tone} dot>
-        {formatToWIB(deadline)} WIB
+        {formatDeadlineLabel(deadline, now)}
       </Badge>
-      <span className={styles.remaining}>{formatRemaining(deadline, now)}</span>
+      <span className={styles.remaining} title={`${formatToWIB(deadline)} WIB`}>
+        {urgency === 'overdue' ? 'Terlambat' : 'Tenggat'}
+      </span>
     </span>
   );
 }

@@ -16,8 +16,8 @@
   margin: 0 auto;
   padding: 1.5rem clamp(1rem, 4vw, 1.75rem);
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-top: 3px solid var(--focus);
+  border: 1.5px solid var(--border);
+  border-top: 4px solid var(--focus);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   transition: border-color 0.2s ease;
@@ -110,36 +110,36 @@
 }
 
 .clock {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 0.6rem solid var(--surface);
+  border-radius: 50%;
+  background: var(--surface);
   font-size: clamp(3.5rem, 16vw, 5.5rem);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
+  font-family: var(--font-heading);
   color: var(--text);
   user-select: none;
 }
 
-.track {
-  width: 100%;
-  max-width: 20rem;
-  height: 4px;
-  border-radius: var(--radius-pill);
-  background: var(--border);
-  overflow: hidden;
-}
-
-.fill {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--focus);
-  transition: width 0.4s linear;
+.clockRing {
+  display: grid;
+  place-items: center;
+  width: min(19rem, 75vw);
+  aspect-ratio: 1;
+  padding: 0.55rem;
+  border-radius: 50%;
+  background: conic-gradient(var(--focus) var(--progress), var(--focus-soft) 0);
+  transition: background 180ms var(--ease);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fill {
-    transition: none;
-  }
+  .clockRing { transition: none; }
 }
 
 .controls {

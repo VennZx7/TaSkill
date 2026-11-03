@@ -63,6 +63,7 @@ export function AiAssistantView({
   return (
     <div className={styles.root}>
       <section className={styles.setup}>
+        <h3 className={styles.setupTitle}>Sumber Materi</h3>
         <div className={styles.setupRow}>
           <div className={styles.setupField}>
             <label className={styles.label} htmlFor="gemini-key">
@@ -82,6 +83,9 @@ export function AiAssistantView({
               Disimpan hanya di browser ini (localStorage), dikirim ke server Gemini saja. Jangan
               pernah memakai key bersama orang lain.
             </p>
+            <span className={`${styles.keyStatus} ${hasKey ? styles.keyReady : ''}`} role="status">
+              {hasKey ? 'Key tersimpan di browser ini' : 'Masukkan key untuk mulai memakai AI'}
+            </span>
           </div>
 
           <div className={styles.setupField}>
@@ -145,8 +149,8 @@ export function AiAssistantView({
               {contextChars.toLocaleString('id-ID')} karakter
               {contextChars > MAX_CONTEXT_CHARS ? ' (dipotong)' : ''}
             </Badge>
-            <Button
-              variant="ghost"
+              <Button
+              variant="primary"
               size="sm"
               onClick={onSummarize}
               disabled={isThinking}

@@ -1,8 +1,8 @@
 .root {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(15rem, 0.8fr) minmax(0, 1.5fr);
   gap: 1rem;
-  height: 100%;
+  min-height: 34rem;
   min-height: 0;
 }
 
@@ -10,19 +10,22 @@
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
-  padding: 0.9rem 1rem;
+  padding: 1.1rem;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 }
 
 .setupRow {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0.85rem;
   align-items: start;
 }
+.setupTitle { font-size: 1.25rem; font-weight: 900; }
+.setupField:nth-child(2) { order: -1; }
+.setupField:first-child { padding-top: 1rem; border-top: 1.5px solid var(--border); }
 
 .setupField {
   display: flex;
@@ -32,19 +35,20 @@
 }
 
 .label {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--text);
 }
 
 .input {
   width: 100%;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  border-radius: 0.875rem;
   background: var(--surface-solid);
-  padding: 0.45rem 0.6rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   color: var(--text);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -60,10 +64,12 @@
 }
 
 .hint {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: var(--text-subtle);
   line-height: 1.5;
 }
+.keyStatus { display: inline-flex; align-self: flex-start; border-radius: var(--radius-pill); padding: 0.2rem 0.55rem; color: var(--text-muted); background: var(--surface-muted); font-size: 0.8125rem; font-weight: 700; }
+.keyReady { color: var(--success-text); background: var(--success-soft); }
 
 /* A styled label wrapping a hidden file input: one control, one focus ring. */
 .upload {
@@ -76,7 +82,9 @@
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text-muted);
-  background: var(--surface-muted);
+  background: var(--primary-soft);
+  border-radius: 0.875rem;
+  min-height: 2.75rem;
   border-style: dashed;
   cursor: pointer;
   transition: color 0.15s ease, border-color 0.15s ease;
@@ -110,9 +118,10 @@
   gap: 0.5rem;
   flex-wrap: wrap;
   padding: 0.5rem 0.6rem;
-  background: var(--accent-soft);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
   color: var(--text-muted);
 }
 
@@ -132,7 +141,10 @@
 }
 
 .contextEmpty {
-  font-size: 0.75rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  padding: 0.8rem;
+  font-size: 0.875rem;
   color: var(--text-subtle);
 }
 
@@ -140,12 +152,12 @@
 .chat {
   display: flex;
   flex-direction: column;
-  min-height: 24rem;
-  flex: 1;
+  min-height: 34rem;
+  height: min(72vh, 52rem);
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
   overflow: hidden;
 }
 
@@ -180,21 +192,21 @@
   height: 3.25rem;
   margin-bottom: 0.75rem;
   border-radius: 50%;
-  background: var(--chrome);
+  background: var(--primary-soft);
   border: 1px solid var(--border-strong);
   box-shadow: var(--shadow-md);
-  color: var(--text-muted);
+  color: var(--primary);
 }
 
 .welcomeTitle {
-  font-size: 1rem;
-  font-weight: 650;
+  font-size: 1.25rem;
+  font-weight: 800;
   letter-spacing: -0.01em;
   color: var(--text);
 }
 
 .welcomeBody {
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   color: var(--text-muted);
   margin-top: 0.3rem;
 }
@@ -212,21 +224,21 @@
   max-width: 34rem;
   padding: 0.55rem 0.8rem;
   border-radius: var(--radius);
-  font-size: 0.875rem;
+  font-size: 1rem;
   line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
 .fromUser .bubble {
-  background: var(--accent-grad);
+  background: var(--primary);
   color: var(--primary-label);
   border-bottom-right-radius: 0.35rem;
 }
 
 .fromAssistant .bubble {
-  background: var(--surface-muted);
-  border: 1px solid var(--border);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
   color: var(--text);
   border-bottom-left-radius: 0.35rem;
 }
@@ -281,18 +293,18 @@
   gap: 0.5rem;
   padding: 0.7rem 0.8rem;
   border-top: 1px solid var(--border);
-  background: var(--surface-muted);
+  background: var(--surface);
 }
 
 .textarea {
   flex: 1;
   min-width: 0;
-  border: 1px solid var(--border-strong);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface-solid);
   padding: 0.5rem 0.6rem;
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--text);
   resize: vertical;
   min-height: 2.6rem;
@@ -323,6 +335,8 @@
 }
 
 @media (max-width: 40rem) {
+  .root { grid-template-columns: 1fr; }
+  .chat { height: 65vh; min-height: 28rem; }
   .setupRow {
     grid-template-columns: 1fr;
   }

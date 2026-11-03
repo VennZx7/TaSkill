@@ -4,7 +4,7 @@ import { getUrgency } from '../utils/date';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { DeadlineBadge } from './DeadlineBadge';
-import { EyeIcon, PencilIcon, TrashIcon } from './ui/icons';
+import { CalendarIcon, DocIcon, EyeIcon, FlagIcon, PencilIcon, TrashIcon } from './ui/icons';
 import styles from './ItemCard.module.css';
 
 const STATUS_TONE = {
@@ -14,10 +14,10 @@ const STATUS_TONE = {
 } as const satisfies Record<TaskStatus, 'neutral' | 'accent' | 'success'>;
 
 const PRIORITY_TONE = {
-  High: 'danger',
+  High: 'accent',
   Medium: 'warning',
   Low: 'neutral',
-} as const satisfies Record<TaskPriority, 'danger' | 'warning' | 'neutral'>;
+} as const satisfies Record<TaskPriority, 'accent' | 'warning' | 'neutral'>;
 
 const PRIORITY_LABEL = {
   High: 'Prioritas tinggi',
@@ -54,7 +54,10 @@ export function ItemCard({ item, onOpen, onEdit, onDelete, onStatusChange }: Ite
   return (
     <article className={`${styles.card} ${variant}`.trim()}>
       <div className={styles.header}>
-        <div>
+        <div className={styles.titleGroup}>
+          <span className={styles.typeIcon} aria-label={ITEM_TYPE_LABEL[item.type]} title={ITEM_TYPE_LABEL[item.type]}>
+            {item.type === 'exam' ? <CalendarIcon size={16} /> : <DocIcon size={16} />}
+          </span>
           <h3 className={styles.title}>{item.title}</h3>
         </div>
         <span className={styles.course}>{item.course}</span>
@@ -70,7 +73,6 @@ export function ItemCard({ item, onOpen, onEdit, onDelete, onStatusChange }: Ite
 
       <div className={styles.footer}>
         <div className={styles.meta}>
-          <Badge tone="neutral">{ITEM_TYPE_LABEL[item.type]}</Badge>
           {onStatusChange ? (
             <select
               className={styles.statusSelect}
@@ -88,7 +90,7 @@ export function ItemCard({ item, onOpen, onEdit, onDelete, onStatusChange }: Ite
           ) : (
             <Badge tone={STATUS_TONE[item.status]}>{item.status}</Badge>
           )}
-          <Badge tone={PRIORITY_TONE[item.priority]}>{PRIORITY_LABEL[item.priority]}</Badge>
+          <Badge tone={PRIORITY_TONE[item.priority]}><FlagIcon size={13} />{PRIORITY_LABEL[item.priority]}</Badge>
         </div>
         <div className={styles.actions}>
           <Button variant="ghost" size="sm" onClick={() => onOpen(item)}>

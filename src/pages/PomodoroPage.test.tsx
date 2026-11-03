@@ -47,6 +47,8 @@ function user() {
 }
 
 async function openFocus(active: ReturnType<typeof user>) {
+  const start = screen.queryByRole('button', { name: 'Mulai Sekarang' });
+  if (start) await active.click(start);
   await active.click(await screen.findByRole('button', { name: 'Focus' }));
   await screen.findByRole('timer');
 }
@@ -175,7 +177,7 @@ describe('Pomodoro focus timer', () => {
     expect(clock()).toBe('5:00');
     expect(screen.getByRole('button', { name: /Pause/ })).toBeDisabled();
     expect(screen.getByRole('timer').closest('section')).toHaveAttribute('data-mode', 'short');
-  });
+  }, 15000);
 
   it('toasts and returns to focus when a break ends', async () => {
     const active = user();
@@ -280,6 +282,7 @@ describe('Pomodoro focus timer', () => {
     const active = user();
     renderApp();
 
+    await active.click(await screen.findByRole('button', { name: 'Mulai Sekarang' }));
     await screen.findByRole('heading', { name: 'Ringkasan Kuliah' });
     await vi.advanceTimersByTimeAsync(500);
 

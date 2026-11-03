@@ -2,19 +2,16 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.7rem;
   /* The sanctioned surface stack: a faint specular sweep and a soft
      top tint over the glass base. The old inline white 0.75 gradient
      painted a near-white band across the top of every card in dark
      mode, washing out the light-on-dark badges in the header. */
-  background:
-    var(--sheen),
-    linear-gradient(180deg, var(--accent-soft) 0%, rgb(0 0 0 / 0) 55%),
-    var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  padding: 1rem 1.1rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1.1rem 1.15rem;
   text-align: left;
   width: 100%;
   transition:
@@ -61,6 +58,7 @@
 
 .done {
   --rail: var(--success-rail);
+  opacity: 0.82;
 }
 
 /* The strikethrough marks the item as done; the title keeps its full
@@ -78,19 +76,25 @@
   gap: 0.6rem;
 }
 
+.titleGroup { display: flex; align-items: flex-start; gap: 0.55rem; min-width: 0; }
+.typeIcon { display: inline-flex; flex: 0 0 auto; color: var(--primary); padding-top: 0.15rem; }
+
 .title {
-  font-size: 0.975rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
+  font-size: 1.125rem;
+  font-weight: 800;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .course {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--accent-text);
-  background: var(--accent-soft);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--surface-muted);
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   padding: 0.15rem 0.6rem;
@@ -99,7 +103,7 @@
 }
 
 .description {
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   color: var(--text-muted);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -128,13 +132,13 @@
 
 .statusSelect {
   font: inherit;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.8125rem;
+  font-weight: 700;
   color: var(--text);
   background: var(--surface-muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  padding: 0.2rem 0.45rem;
+  border-radius: 0.75rem;
+  padding: 0.45rem 0.6rem;
   cursor: pointer;
   max-width: 8.5rem;
 }

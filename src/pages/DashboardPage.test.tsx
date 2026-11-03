@@ -91,6 +91,8 @@ function renderApp() {
 }
 
 async function waitForDashboard() {
+  const start = screen.queryByRole('button', { name: 'Mulai Sekarang' });
+  if (start) await userEvent.setup().click(start);
   await screen.findByRole('heading', { level: 2, name: 'Tenggat Waktu Dekat' });
 }
 
@@ -109,10 +111,10 @@ describe('Smart Dashboard', () => {
 
   it('is the default view on load', async () => {
     renderApp();
+    await waitForDashboard();
 
     expect(await screen.findByRole('heading', { name: 'Ringkasan Kuliah' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Beranda' })).toHaveAttribute('aria-current', 'page');
-    await waitForDashboard();
   });
 
   it('shows the level and XP progress on the landing page', async () => {
@@ -243,6 +245,7 @@ describe('Smart Dashboard', () => {
   it('shows one retryable error state when either module is broken', async () => {
     window.localStorage.setItem(VAULT_KEY, '{rusak');
     renderApp();
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Mulai Sekarang' }));
 
     expect(await screen.findByText('Gagal memuat data')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Coba lagi/ })).toBeInTheDocument();

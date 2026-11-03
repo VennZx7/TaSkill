@@ -14,14 +14,12 @@
      top tint over the glass base. The old inline white 0.75 gradient
      painted a near-white band across the top of every card in dark
      mode, washing out the light-on-dark badges in the header. */
-  background:
-    var(--sheen),
-    linear-gradient(180deg, var(--accent-soft) 0%, rgb(0 0 0 / 0) 55%),
-    var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  padding: 1rem 1.1rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1.1rem;
+  transition: transform 160ms var(--ease), box-shadow 160ms var(--ease);
   overflow: hidden;
   transition:
     box-shadow 0.2s var(--ease),
@@ -31,10 +29,8 @@
 /* Elevation plus an iridescent edge — the chroma lives in the border
    glow, never as a mask over the card body. */
 .card:hover {
-  box-shadow:
-    var(--shadow-md),
-    0 0 1.1rem var(--holo-glow-soft);
-  border-color: var(--holo-ring);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Marks the deck as the source of an AI-generated set. */
@@ -96,9 +92,8 @@
 }
 
 .title {
-  font-size: 0.975rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: 1.125rem;
+  font-weight: 800;
   line-height: 1.4;
   overflow-wrap: anywhere;
 }

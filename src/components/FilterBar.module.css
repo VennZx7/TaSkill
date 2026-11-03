@@ -4,10 +4,9 @@
   gap: 0.7rem;
   flex-wrap: wrap;
   background: var(--surface);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  padding: 0.85rem 1rem 0.15rem;
+  padding: 0.85rem 1rem;
   box-shadow: var(--shadow-sm);
 }
 
@@ -29,7 +28,10 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
+  border-radius: var(--radius-pill);
+  background: var(--primary-soft);
+  padding: 0.35rem 0.7rem;
   color: var(--text-muted);
   align-self: center;
   white-space: nowrap;

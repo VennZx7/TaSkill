@@ -2,12 +2,11 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  border: 1px solid transparent;
+  border: 1.5px solid transparent;
   border-radius: var(--radius-pill);
-  padding: 0.2rem 0.65rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
   line-height: 1.5;
   white-space: nowrap;
 }
@@ -18,7 +17,7 @@
   border-radius: 50%;
   background: currentColor;
   flex-shrink: 0;
-  box-shadow: 0 0 5px currentColor;
+  box-shadow: none;
 }
 
 .neutral {
@@ -46,7 +45,7 @@
 }
 
 .accent {
-  background: var(--accent-soft);
-  border-color: var(--border-strong);
-  color: var(--accent-text);
+  background: var(--primary-soft);
+  border-color: var(--border);
+  color: var(--primary-dark);
 }

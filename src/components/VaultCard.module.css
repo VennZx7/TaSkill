@@ -7,14 +7,11 @@
      top tint over the glass base. The old inline white 0.75 gradient
      painted a near-white band across the top of every card in dark
      mode, washing out the light-on-dark badges in the header. */
-  background:
-    var(--sheen),
-    linear-gradient(180deg, var(--accent-soft) 0%, rgb(0 0 0 / 0) 55%),
-    var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  padding: 1rem 1.1rem;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1.1rem;
   transition:
     box-shadow 0.2s var(--ease),
     border-color 0.2s var(--ease);
@@ -67,9 +64,8 @@
 }
 
 .title {
-  font-size: 0.975rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: 1.125rem;
+  font-weight: 800;
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
@@ -77,10 +73,10 @@
 .course {
   display: inline-block;
   margin-top: 0.2rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--accent-text);
-  background: var(--accent-soft);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--surface-muted);
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
   padding: 0.1rem 0.55rem;
@@ -109,7 +105,7 @@
 }
 
 .preview {
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   color: var(--text-muted);
   line-height: 1.55;
   display: -webkit-box;

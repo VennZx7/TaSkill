@@ -145,6 +145,23 @@ export function formatRemaining(deadline: string, now: number = Date.now()): str
   return diff < 0 ? `Terlambat ${plural(days, 'hari')}` : `Sisa ${plural(days, 'hari')}`;
 }
 
+/** Short presentation label for cards; stored deadline values remain untouched. */
+export function formatDeadlineLabel(deadline: string, now: number = Date.now()): string {
+  const instant = parseDeadline(deadline);
+  if (instant === null) return INVALID_DATE_LABEL;
+  if (instant < now) return formatRemaining(deadline, now);
+
+  const currentStart = startOfWIBDay(now);
+  const deadlineStart = startOfWIBDay(instant);
+  const time = formatToWIB(deadline).slice(-5);
+  if (deadlineStart === currentStart) return `Hari ini ${time}`;
+  if (deadlineStart === currentStart + DAY_MS) return `Besok ${time}`;
+
+  const date = formatToWIB(deadline).slice(0, 10).split('-');
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  return `${Number(date[2])} ${months[Number(date[1]) - 1]}`;
+}
+
 /**
  * The single deadline comparator. Compares absolute instants, never strings.
  * Unparseable deadlines sort last; ties break on createdAt so the order is stable.

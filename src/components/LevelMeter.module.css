@@ -19,9 +19,9 @@
   flex-shrink: 0;
   font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--primary-label);
-  background: var(--brand-grad);
+  letter-spacing: 0;
+  color: var(--warning-text);
+  background: var(--warning-soft);
   border-radius: var(--radius-pill);
   padding: 0.15rem 0.5rem;
   white-space: nowrap;
@@ -54,8 +54,8 @@
   display: block;
   height: 100%;
   border-radius: var(--radius-pill);
-  background: var(--holo-grad);
-  box-shadow: 0 0 0.5rem var(--holo-glow);
+  background: var(--xp-grad);
+  box-shadow: none;
   transition: width 0.4s var(--ease);
 }
 
@@ -92,5 +92,5 @@
 }
 
 .compact .count {
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
 }

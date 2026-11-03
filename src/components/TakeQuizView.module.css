@@ -19,9 +19,8 @@
 }
 
 .title {
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 1.5rem;
+  font-weight: 900;
 }
 
 .meta {
@@ -45,8 +44,8 @@
   flex-wrap: wrap;
   padding: 0.8rem 1rem;
   background: var(--accent-soft);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 }
 
@@ -59,6 +58,31 @@
   border-color: var(--success-border);
   background: var(--success-soft);
 }
+
+.scoreRing {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 4.5rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: conic-gradient(var(--success) var(--score-progress), var(--success-soft) 0);
+  color: var(--success-text);
+}
+
+.scoreRing strong {
+  display: grid;
+  place-items: center;
+  width: calc(100% - 0.65rem);
+  height: calc(100% - 0.65rem);
+  border-radius: 50%;
+  background: var(--surface);
+  font-size: 1rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.xpReward { margin-top: 0.15rem; color: var(--xp-text); font-size: 0.9375rem; font-weight: 900; }
 
 .scoreIcon {
   display: inline-flex;
@@ -79,13 +103,13 @@
 }
 
 .scoreValue {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 900;
   letter-spacing: -0.01em;
 }
 
 .scoreNote {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--text-muted);
 }
 
@@ -104,11 +128,11 @@
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
-  padding: 0.9rem 1rem;
+  padding: 1.2rem;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
 }
 
 .questionHead {
@@ -126,8 +150,8 @@
 }
 
 .prompt {
-  font-size: 0.9375rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 800;
   line-height: 1.55;
 }
 
@@ -144,8 +168,9 @@
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  padding: 0.5rem 0.7rem;
-  border: 1px solid var(--border-strong);
+  min-height: 3.25rem;
+  padding: 0.75rem 0.9rem;
+  border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface-solid);
   cursor: pointer;
@@ -212,7 +237,7 @@
 .optionText {
   flex: 1;
   min-width: 0;
-  font-size: 0.875rem;
+  font-size: 1rem;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }

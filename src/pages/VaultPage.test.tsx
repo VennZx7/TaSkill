@@ -73,6 +73,8 @@ function storedVault(): VaultItem[] {
 }
 
 async function openVault(user: ReturnType<typeof userEvent.setup>) {
+  const start = screen.queryByRole('button', { name: 'Mulai Sekarang' });
+  if (start) await user.click(start);
   await user.click(await screen.findByRole('button', { name: 'Study Vault' }));
   await screen.findByRole('heading', { name: 'Study Vault' });
 }
@@ -322,11 +324,11 @@ describe('Study Vault module', () => {
       pdfFile('uts-kalkulus.pdf', 'Limit dan kontinuitas'),
     );
 
-    expect(await screen.findByText('Konten uts-kalkulus.pdf berhasil dimuat.')).toBeInTheDocument();
+    expect(await screen.findByText('1 berkas dimuat.')).toBeInTheDocument();
     // Receiving a file flips the material to a document on its own.
     expect(dialog().getByLabelText(/Jenis/)).toHaveValue('document');
     expect(dialog().getByLabelText(/Isi dokumen/)).toHaveValue(
-      'Limit dan kontinuitas',
+      '=== uts-kalkulus.pdf ===\nLimit dan kontinuitas',
     );
     // The file name seeds an empty title.
     expect(dialog().getByLabelText(/Judul/)).toHaveValue('uts-kalkulus');
@@ -341,7 +343,7 @@ describe('Study Vault module', () => {
       (item) => item.title === 'Materi UTS Kalkulus',
     );
     expect(created?.type).toBe('document');
-    expect(created?.urlOrContent).toBe('Limit dan kontinuitas');
+    expect(created?.urlOrContent).toBe('=== uts-kalkulus.pdf ===\nLimit dan kontinuitas');
   });
 
   it('edits an existing item, keeping id and read state', async () => {

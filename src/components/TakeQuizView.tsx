@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { useQuizzes } from '../context/QuizContext';
 import { useUser } from '../context/UserContext';
 import { recordStreakActivity } from '../services/streakService';
@@ -58,6 +58,8 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
     }).length;
     return { correct, total: choiceQuestions.length };
   }, [answers, choiceQuestions]);
+  const scorePercent = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
+  const earnedXp = scorePercent > 75 ? QUIZ_XP : 0;
 
   const setAnswer = (id: string, value: string) =>
     setAnswers((previous) => ({ ...previous, [id]: value }));
@@ -156,6 +158,17 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
             score.correct === score.total && score.total > 0 ? styles.scorePerfect : ''
           }`}
         >
+          <span
+            className={styles.scoreRing}
+            role="progressbar"
+            aria-label="Persentase jawaban benar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={scorePercent}
+            style={{ '--score-progress': `${scorePercent}%` } as CSSProperties}
+          >
+            <strong>{scorePercent}%</strong>
+          </span>
           <span className={styles.scoreIcon} aria-hidden="true">
             {score.correct === score.total && score.total > 0 ? (
               <CheckCircleIcon size={20} />
@@ -167,6 +180,7 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
             <p className={styles.scoreValue}>
               Skor: {score.correct} dari {score.total} soal pilihan ganda
             </p>
+            {earnedXp > 0 ? <p className={styles.xpReward}>+{earnedXp} XP berhasil didapat!</p> : null}
             <p className={styles.scoreNote}>
               Soal jawaban singkat ditampilkan di bawah. Nilai sendiri dengan tombol
               “Aku benar / Aku salah” agar tercatat di statistik area lemah.
