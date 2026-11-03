@@ -24,10 +24,11 @@
   .navTab svg { display: block; }
 }
 @media (max-width: 48rem) {
-  .navbar { min-height: 3.75rem; padding: 0.45rem 1rem; }
+  .navbar { min-height: 3.75rem; padding: 0.45rem 0.75rem; }
+  .brand { display: none; }
   .brandText { font-size: 1.05rem; }
-  .actions { gap: 0.35rem; }
-  .streak { padding: 0.3rem 0.5rem; }
+  .actions { width: 100%; min-width: 0; gap: 0.4rem; justify-content: space-between; }
+  .streak { flex: 0 0 auto; padding: 0.3rem 0.45rem; font-size: 0.875rem; }
   .main { padding: 1.25rem 1rem 6.5rem; gap: 1.2rem; }
   .nav { position: fixed; z-index: 30; left: 0.75rem; right: 0.75rem; bottom: max(0.75rem, env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; padding: 0.4rem; border: 2px solid var(--ink); border-radius: 1.25rem; background: var(--surface); box-shadow: 4px 4px 0 var(--ink); }
   .navTab { min-height: 3.25rem; display: flex; flex-direction: column; gap: 0.15rem; padding: 0.3rem 0.1rem; border-radius: 0.9rem; font-size: 0.625rem; line-height: 1.15; white-space: normal; }
@@ -36,8 +37,7 @@
 }
 @media (prefers-reduced-motion: reduce) { .fire { animation: none; } }
 @media (max-width: 23rem) {
-  .navbar { flex-wrap: wrap; }
-  .brand { flex: 1; }
-  .actions { flex: 1 1 auto; justify-content: flex-end; }
+  .navbar { flex-wrap: nowrap; }
+  .actions { gap: 0.25rem; }
   .nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }

@@ -39,4 +39,9 @@
 @media (max-width: 23rem) {
   .compact .track { display: none; }
 }
+@media (max-width: 48rem) {
+  .compact { gap: 0.3rem; }
+  .compact .track { display: none; }
+  .compact .count { font-size: 0.6875rem; }
+}
 @media (prefers-reduced-motion: reduce) { .badge { animation: none; } .fill { transition: none; } }
