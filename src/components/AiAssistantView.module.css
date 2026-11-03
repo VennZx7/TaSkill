@@ -17,6 +17,8 @@
 .fileInput { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .fileInput:focus-visible + span, .upload:focus-within { outline: 3px solid var(--violet); outline-offset: 2px; }
 .contextBar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 0.65rem; border: 2px solid var(--ink); border-radius: 0.75rem; background: var(--sky-soft); color: var(--ink); }
+.contextSource { flex: 1 1 100%; color: var(--ink-2); font-size: 0.8125rem; font-weight: 800; }
+.uploadError { padding: 0.7rem 0.8rem; border: 2px solid var(--ink); border-radius: 0.75rem; background: var(--red-soft); color: #7f1d1d; font-size: 0.875rem; font-weight: 700; }
 .contextName { flex: 1 1 8rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.875rem; font-weight: 900; }
 .contextBar > button:first-of-type { margin-left: 0; }
 .summarize { flex: 1 1 100%; min-height: 3rem; border: 2px solid var(--ink) !important; border-radius: 0.85rem !important; background: var(--ai-grad) !important; color: #fff !important; box-shadow: 4px 4px 0 var(--ink) !important; font-size: 1rem !important; }

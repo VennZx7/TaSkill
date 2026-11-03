@@ -5,7 +5,7 @@ import type {
 } from '../hooks/useQuizGenerator';
 import { useEffect, useState } from 'react';
 import type { FlashcardCount } from '../types/flashcard';
-import { MAX_CONTEXT_CHARS } from '../services/geminiService';
+import { MAX_GENERATION_CONTEXT_CHARS } from '../services/geminiService';
 import { Button } from './ui/Button';
 import { Input, Select } from './ui/Field';
 import { Modal } from './ui/Modal';
@@ -49,7 +49,7 @@ const TARGET_OPTIONS: {
   {
     value: 'both',
     label: 'Generate Both',
-    body: 'Satu set kuis dan satu deck flashcard sekaligus.',
+    body: 'Satu kuis dan satu deck; dua proses AI, jadi lebih lama.',
     Icon: SparkleIcon,
   },
 ];
@@ -156,7 +156,7 @@ export function QuizGeneratorModal({
     <Modal
       open={open}
       title="Generate Quiz & Flashcards dengan AI"
-      description="Pilih sumber materinya, lalu pilih mau dibuat kuis, flashcard, atau keduanya."
+      description="Default 5 soal agar cepat untuk demo. Pilih Flashcards atau keduanya bila perlu; Generate Both menjalankan dua proses AI."
       onClose={onClose}
       footer={
         <>
@@ -181,8 +181,8 @@ export function QuizGeneratorModal({
           <div className={`${shared.skeleton} ${styles.pendingBar}`} />
           <p className={styles.pendingNote}>
             {generationStage || 'Gemini sedang menyusun'} {count} {TARGET_PENDING_LABEL[target]} dari “
-            {source?.title ?? 'materi'}”. ({elapsed}s) Materi dipotong maksimal{' '}
-            {MAX_CONTEXT_CHARS.toLocaleString('id-ID')} karakter.
+            {source?.title ?? 'materi'}”. ({elapsed}s) Untuk menjaga proses tetap ringkas, materi panjang diambil cuplikannya hingga{' '}
+            {MAX_GENERATION_CONTEXT_CHARS.toLocaleString('id-ID')} karakter.
           </p>
         </div>
       ) : (
@@ -209,7 +209,7 @@ export function QuizGeneratorModal({
               required
               value={materialId}
               onChange={(event) => onMaterialChange(event.target.value)}
-              hint="Hanya catatan dan dokumen yang bisa dikirim, tautan tidak berisi teks."
+            hint="Hanya catatan dan dokumen yang bisa dikirim. Generate satu jenis lebih cepat; pilihan keduanya mengirim dua permintaan AI."
             >
               <option value="">Pilih dari Study Vault…</option>
               {materials.map((material) => (
@@ -275,7 +275,7 @@ export function QuizGeneratorModal({
               <span className={styles.sourceBadge}>
                 {source.pageCount ? `${source.pageCount} halaman · ` : ''}
                 {source.text.length.toLocaleString('id-ID')} karakter
-                {source.text.length > MAX_CONTEXT_CHARS ? ' (dipotong)' : ''}
+                {source.text.length > MAX_GENERATION_CONTEXT_CHARS ? ' (cuplikan merata dipakai saat generate)' : ''}
               </span>
             </div>
           ) : null}

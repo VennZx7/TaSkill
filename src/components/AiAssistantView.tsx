@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { MAX_CONTEXT_CHARS } from '../services/geminiService';
-import type { ChatMessage } from '../hooks/useAiAssistant';
+import type { AssistantContextSource, ChatMessage } from '../hooks/useAiAssistant';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { KeyIcon, NoteIcon, SendIcon, SparkleIcon, UploadIcon } from './ui/icons';
@@ -19,6 +19,8 @@ interface AiAssistantViewProps {
   contextLabel: string | null;
   contextChars: number;
   contextPages: number | null;
+  contextSource: AssistantContextSource | null;
+  contextError: string | null;
   isLoadingContext: boolean;
   selectableItems: SelectableItem[];
   onPickVaultItem: (id: string) => void;
@@ -36,6 +38,8 @@ export function AiAssistantView({
   contextLabel,
   contextChars,
   contextPages,
+  contextSource,
+  contextError,
   isLoadingContext,
   selectableItems,
   onPickVaultItem,
@@ -124,8 +128,13 @@ export function AiAssistantView({
                 }}
               />
             </label>
+            <p className={styles.hint}>
+              Unggahan di sini hanya dipakai sementara untuk AI. Untuk menyimpannya di Study Vault, gunakan menu Study Vault → Simpan materi.
+            </p>
           </div>
         </div>
+
+        {contextError ? <p className={styles.uploadError} role="alert">{contextError}</p> : null}
 
         {isLoadingContext ? (
           <div className={styles.contextBar} role="status" aria-live="polite">
@@ -134,13 +143,16 @@ export function AiAssistantView({
               <span className={styles.dot} />
               <span className={styles.dot} />
             </span>
-            <span className={styles.contextName}>Membaca halaman PDF…</span>
+            <span className={styles.contextName}>Membaca materi yang diunggah…</span>
           </div>
         ) : contextLabel ? (
           <div className={styles.contextBar}>
             <NoteIcon size={13} />
             <span className={styles.contextName} title={contextLabel}>
               {contextLabel}
+            </span>
+            <span className={styles.contextSource}>
+              {contextSource === 'upload' ? 'Unggahan sementara · belum disimpan ke Vault' : 'Dari Study Vault'}
             </span>
             <Badge tone="accent">
               {contextPages ? `${contextPages} halaman · ` : ''}

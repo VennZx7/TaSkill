@@ -12,6 +12,8 @@ export interface ChatMessage {
   text: string;
 }
 
+export type AssistantContextSource = 'vault' | 'upload';
+
 export function useAiAssistant() {
   const toast = useToast();
   const { visibleItems } = useVault();
@@ -21,6 +23,8 @@ export function useAiAssistant() {
   const [documentContext, setDocumentContext] = useState('');
   const [contextLabel, setContextLabel] = useState<string | null>(null);
   const [contextPages, setContextPages] = useState<number | null>(null);
+  const [contextSource, setContextSource] = useState<AssistantContextSource | null>(null);
+  const [contextError, setContextError] = useState<string | null>(null);
   const [isLoadingContext, setIsLoadingContext] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
 
@@ -33,12 +37,15 @@ export function useAiAssistant() {
     setDocumentContext('');
     setContextLabel(null);
     setContextPages(null);
+    setContextSource(null);
+    setContextError(null);
   }, []);
 
   const loadFromVault = useCallback((item: VaultItem) => {
+    setContextError(null);
     setDocumentContext(item.urlOrContent);
     setContextLabel(item.title);
-    // setContextPages(null);
+    setContextSource('vault');
     const pages = (item.sources ?? []).reduce((sum, s) => sum + (s.pageCount ?? 0), 0);
     setContextPages(pages > 0 ? pages : null);
   }, []);
@@ -46,14 +53,26 @@ export function useAiAssistant() {
   const loadFromFile = useCallback(
     async (file: File) => {
       setIsLoadingContext(true);
+      setContextError(null);
+      setDocumentContext('');
+      setContextLabel(null);
+      setContextPages(null);
+      setContextSource(null);
       try {
         const loaded: LoadedDocument = await readTextFile(file);
         setDocumentContext(loaded.text);
         setContextLabel(loaded.name);
         setContextPages(loaded.pageCount ?? null);
+        setContextSource('upload');
+        toast(`"${loaded.name}" siap dipakai di Asisten AI. File ini belum disimpan ke Study Vault.`);
       } catch (error) {
+        const rawMessage = error instanceof Error ? error.message : 'File gagal dimuat.';
+        const message = rawMessage.startsWith('PDF ini berisi gambar')
+          ? 'PDF ini belum bisa dibaca karena kemungkinan berupa hasil scan/gambar atau memakai kompresi yang belum didukung. Coba PDF yang teksnya bisa dipilih, atau lakukan OCR terlebih dahulu.'
+          : rawMessage;
+        setContextError(message);
         toast({
-          message: error instanceof Error ? error.message : 'File gagal dimuat.',
+          message,
           tone: 'error',
         });
       } finally {
@@ -139,6 +158,8 @@ export function useAiAssistant() {
     contextLabel,
     contextChars: documentContext.length,
     contextPages,
+    contextSource,
+    contextError,
     isLoadingContext,
     selectableItems: visibleItems.filter(isStudyMaterial),
     loadFromVault,

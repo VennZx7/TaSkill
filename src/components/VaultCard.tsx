@@ -54,7 +54,16 @@ export function VaultCard({ item, onEdit, onDelete, onToggleRead }: VaultCardPro
           {host || item.urlOrContent}
         </a>
       ) : (
-        <p className={styles.preview}>{item.urlOrContent}</p>
+        <>
+          <p className={styles.preview}>{item.urlOrContent}</p>
+          <details className={styles.reader}>
+            <summary>Baca materi lengkap</summary>
+            {item.sources?.length ? (
+              <p className={styles.sourceNames}>Berkas: {item.sources.map((source) => source.name).join(', ')}</p>
+            ) : null}
+            <div className={styles.fullText}>{item.urlOrContent}</div>
+          </details>
+        </>
       )}
 
       <div className={styles.tags}>

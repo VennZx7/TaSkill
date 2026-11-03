@@ -58,9 +58,11 @@ export function ItemCard({ item, onOpen, onEdit, onDelete, onStatusChange }: Ite
           <span className={styles.typeIcon} aria-label={ITEM_TYPE_LABEL[item.type]} title={ITEM_TYPE_LABEL[item.type]}>
             {item.type === 'exam' ? <CalendarIcon size={16} /> : <DocIcon size={16} />}
           </span>
-          <button type="button" className={styles.titleButton} onClick={() => onOpen(item)} aria-label={`Detail: ${item.title}`}>
-            <span className={styles.title}>{item.title}</span>
-          </button>
+          <h3 className={styles.title}>
+            <button type="button" className={styles.titleButton} onClick={() => onOpen(item)} aria-label={`Detail: ${item.title}`}>
+              {item.title}
+            </button>
+          </h3>
         </div>
         <span className={styles.course}>{item.course}</span>
       </div>

@@ -107,6 +107,37 @@ describe('generateFlashcards', () => {
     await expect(generateFlashcards('AIzaTest', 'Limit fungsi', 5)).rejects.toThrow(/Kuota Gemini habis/i);
   });
 
+  it('uses a distinct fast fallback model when the primary is overloaded', async () => {
+    const responses = [
+      { ok: false, status: 503, text: async () => JSON.stringify({ error: { message: 'This model is currently experiencing high demand.' } }) },
+      geminiResponse('[{"question":"Q1","answer":"A1"}]'),
+    ];
+    const fetchMock = vi.fn(async () => responses.shift() as Response);
+    vi.stubGlobal('fetch', fetchMock);
+
+    const cards = await generateFlashcards('AIzaTest', 'Limit fungsi', 1);
+
+    expect(cards).toEqual([{ question: 'Q1', answer: 'A1' }]);
+    const urls = (fetchMock.mock.calls as unknown as Array<[string, RequestInit]>).map(([url]) => String(url));
+    expect(urls[0]).toContain('gemini-3.8-flash');
+    expect(urls[1]).toContain('gemini-3.5-flash-lite');
+  });
+
+  it('shows a helpful Indonesian message if both models are overloaded', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: false,
+        status: 503,
+        text: async () => JSON.stringify({ error: { message: 'This model is currently experiencing high demand.' } }),
+      }) as unknown as Response),
+    );
+
+    await expect(generateFlashcards('AIzaTest', 'Limit fungsi', 1)).rejects.toThrow(
+      /Layanan Gemini sedang padat.*model cadangan/i,
+    );
+  });
+
   it('never echoes the API key back in an upstream error message', async () => {
     vi.stubGlobal(
       'fetch',

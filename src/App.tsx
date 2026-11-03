@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useTheme } from './hooks/useTheme';
 import { AppShell, type Module } from './components/AppShell';
+import shellStyles from './components/AppShell.module.css';
 import { Button } from './components/ui/Button';
 import { ToastProvider } from './components/ui/Toast';
 import { FlashcardProvider } from './context/FlashcardContext';
@@ -19,13 +21,20 @@ import { LandingPage } from './pages/landing/LandingPage';
  * No router is installed, and one is not needed: six modules behind one shell,
  * so the current module is local state. The dashboard is the landing view.
  */
-function Workspace({ onExit }: { onExit: () => void }) {
+function Workspace({ onExit, theme, onThemeToggle }: { onExit: () => void; theme: 'light' | 'dark'; onThemeToggle: () => void }) {
   const [module, setModule] = useState<Module>('dashboard');
+  const [hasVisitedAi, setHasVisitedAi] = useState(false);
+  const navigate = (next: Module) => {
+    if (next === 'ai') setHasVisitedAi(true);
+    setModule(next);
+  };
 
   return (
     <AppShell
       module={module}
-      onNavigate={setModule}
+      onNavigate={navigate}
+      theme={theme}
+      onThemeToggle={onThemeToggle}
       actions={
         <>
           <Button variant="ghost" size="sm" onClick={onExit}>
@@ -34,15 +43,19 @@ function Workspace({ onExit }: { onExit: () => void }) {
         </>
       }
     >
-        {module === 'dashboard' ? (
-          <DashboardPage onNavigate={setModule} />
+      <div
+        className={module === 'ai' ? shellStyles.aiHostActive : shellStyles.aiHostInactive}
+        aria-hidden={module !== 'ai'}
+      >
+        {hasVisitedAi ? <AiAssistantPage /> : null}
+      </div>
+      {module === 'dashboard' ? (
+          <DashboardPage onNavigate={navigate} />
         ) : module === 'scheduler' ? (
           <TaskPage />
         ) : module === 'pomodoro' ? (
           <PomodoroPage />
-        ) : module === 'ai' ? (
-          <AiAssistantPage />
-        ) : module === 'flashcards' ? (
+        ) : module === 'ai' ? null : module === 'flashcards' ? (
           <QuizView />
         ) : (
           <VaultPage />
@@ -53,9 +66,10 @@ function Workspace({ onExit }: { onExit: () => void }) {
 
 export function App() {
   const [entered, setEntered] = useState(false);
+  const { theme, toggle } = useTheme();
 
   if (!entered) {
-    return <LandingPage onEnter={() => setEntered(true)} />;
+    return <LandingPage onEnter={() => setEntered(true)} theme={theme} onThemeToggle={toggle} />;
   }
 
   return (
@@ -65,7 +79,7 @@ export function App() {
             <FlashcardProvider>
               <QuizProvider>
                 <UserProvider>
-                  <Workspace onExit={() => setEntered(false)} />
+                  <Workspace onExit={() => setEntered(false)} theme={theme} onThemeToggle={toggle} />
                 </UserProvider>
               </QuizProvider>
             </FlashcardProvider>

@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import { useUser } from '../context/UserContext';
 import { LevelMeter } from './LevelMeter';
 import { getStreakCount } from '../services/streakService';
+import { ThemeToggle } from './ui/ThemeToggle';
+import type { Theme } from '../hooks/useTheme';
 import { BrandMarkIcon, CalendarIcon, CardsIcon, PlayIcon, SparkleIcon, VaultIcon } from './ui/icons';
 import styles from './AppShell.module.css';
 
@@ -10,6 +12,8 @@ export type Module = 'dashboard' | 'scheduler' | 'vault' | 'pomodoro' | 'ai' | '
 interface AppShellProps {
   module: Module;
   onNavigate: (module: Module) => void;
+  theme: Theme;
+  onThemeToggle: () => void;
   actions: ReactNode;
   children: ReactNode;
 }
@@ -23,7 +27,7 @@ const TABS: { value: Module; label: string; Icon: typeof BrandMarkIcon }[] = [
   { value: 'flashcards', label: 'Quiz', Icon: CardsIcon },
 ];
 
-export function AppShell({ module, onNavigate, actions, children }: AppShellProps) {
+export function AppShell({ module, onNavigate, theme, onThemeToggle, actions, children }: AppShellProps) {
   const { level, title, progress } = useUser();
 
   return (
@@ -56,6 +60,7 @@ export function AppShell({ module, onNavigate, actions, children }: AppShellProp
             <span className={styles.fire} aria-hidden="true">🔥</span> {getStreakCount()}
           </span>
           <LevelMeter level={level} title={title} progress={progress} variant="compact" />
+          <ThemeToggle theme={theme} onToggle={onThemeToggle} />
           {actions}
         </div>
       </header>

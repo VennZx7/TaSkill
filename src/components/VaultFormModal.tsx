@@ -249,6 +249,7 @@ export function VaultFormModal({
               }}
             />
           </label>
+          <p className={styles.uploadHint}>Berkas sudah masuk ke formulir. Lengkapi mata kuliah, lalu tekan Simpan agar materi muncul di Study Vault.</p>
         </div>
 
         {errors.sources ? (

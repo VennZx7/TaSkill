@@ -49,7 +49,7 @@ export function PomodoroView({
 }: PomodoroViewProps) {
   const total = MODES.find((entry) => entry.value === mode)?.minutes ?? 25;
   // Progress as a fraction of the full session; purely visual, no animation loop.
-  const progress = 1 - remaining / (total * 60);
+  const progress = remaining / (total * 60);
 
   return (
     <section className={styles.root} data-mode={mode} aria-label="Pomodoro focus timer">
@@ -64,8 +64,8 @@ export function PomodoroView({
               aria-pressed={active}
               onClick={() => onModeChange(entry.value)}
             >
-              {entry.label}
-              <span className={styles.modeMinutes}>{entry.minutes} mnt</span>
+              <span className={styles.modeLabel}>{entry.label}</span>
+              <span className={styles.modeMinutes}>{entry.minutes} menit</span>
             </button>
           );
         })}
@@ -77,7 +77,7 @@ export function PomodoroView({
         <div
           className={styles.clockRing}
           role="progressbar"
-          aria-label="Kemajuan sesi"
+          aria-label="Waktu tersisa pada sesi"
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress * 100)}

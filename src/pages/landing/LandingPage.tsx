@@ -1,7 +1,9 @@
 import { BrandMarkIcon, CalendarIcon, CardsIcon, PlayIcon, SparkleIcon, VaultIcon } from '../../components/ui/icons';
+import { ThemeToggle } from '../../components/ui/ThemeToggle';
+import type { Theme } from '../../hooks/useTheme';
 import styles from './LandingPage.module.css';
 
-interface LandingPageProps { onEnter: () => void }
+interface LandingPageProps { onEnter: () => void; theme: Theme; onThemeToggle: () => void }
 
 const modules = [
   { title: 'Jadwal kuliah', text: 'Atur tugas, ujian, dan target belajarmu.', Icon: CalendarIcon, tone: 'purple' },
@@ -10,12 +12,15 @@ const modules = [
   { title: 'Quiz & AI', text: 'Ubah materi jadi latihan dan flashcard.', Icon: SparkleIcon, tone: 'green' },
 ];
 
-export function LandingPage({ onEnter }: LandingPageProps) {
+export function LandingPage({ onEnter, theme, onThemeToggle }: LandingPageProps) {
   return (
     <div className={styles.landing}>
       <header className={styles.header}>
         <div className={styles.brand}><span className={styles.brandMark}><BrandMarkIcon size={22} /></span><span className={styles.brandName}>TaSkill</span></div>
-        <button type="button" className={styles.enterGhost} onClick={onEnter}>Masuk ke aplikasi</button>
+        <div className={styles.headerActions}>
+          <ThemeToggle theme={theme} onToggle={onThemeToggle} />
+          <button type="button" className={styles.enterGhost} onClick={onEnter}>Masuk ke aplikasi</button>
+        </div>
       </header>
 
       <main className={styles.main}>

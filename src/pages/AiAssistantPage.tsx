@@ -26,6 +26,8 @@ export function AiAssistantPage() {
         contextLabel={assistant.contextLabel}
         contextChars={assistant.contextChars}
         contextPages={assistant.contextPages}
+        contextSource={assistant.contextSource}
+        contextError={assistant.contextError}
         isLoadingContext={assistant.isLoadingContext}
         selectableItems={assistant.selectableItems.map((item) => ({
           id: item.id,

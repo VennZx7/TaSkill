@@ -89,6 +89,54 @@
   --bg-aurora: var(--bg);
 }
 
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #171528;
+  --surface: #25213a;
+  --surface-solid: #25213a;
+  --surface-muted: #302b49;
+  --surface-2: #302b49;
+  --ink: #f2edff;
+  --ink-2: #c2bbd7;
+  --text: var(--ink);
+  --text-muted: var(--ink-2);
+  --text-subtle: var(--ink-2);
+  --text-2: var(--ink-2);
+  --border: #827b9d;
+  --border-strong: #aaa2c6;
+  --violet-soft: #3a345f;
+  --sky-soft: #203b4b;
+  --orange-soft: #4b3429;
+  --yellow-soft: #4b4226;
+  --green-soft: #203b30;
+  --red-soft: #48272f;
+  --primary-soft: var(--violet-soft);
+  --accent-soft: var(--violet-soft);
+  --accent-text: #d6d0ff;
+  --xp-soft: var(--orange-soft);
+  --xp-text: #ffd0a5;
+  --warning-soft: var(--yellow-soft);
+  --warning-border: #bcae7a;
+  --warning-text: #ffe5a2;
+  --success-soft: var(--green-soft);
+  --success-border: #69bd89;
+  --success-text: #a9efc1;
+  --danger-soft: var(--red-soft);
+  --danger-border: #dc818a;
+  --danger-text: #ffc0c7;
+  --info-soft: var(--sky-soft);
+  --focus-ring: #4a416e;
+  --holo-glow: #38314f;
+  --holo-glow-soft: #38314f;
+  --chrome: var(--surface);
+  --rail-default: #9189ad;
+  --shadow-sm: 2px 2px 0 #090812;
+  --shadow: 4px 4px 0 #090812;
+  --shadow-md: 6px 6px 0 #090812;
+  --shadow-lg: 8px 8px 0 #090812;
+  --bg-aurora: var(--bg);
+}
+
 :root {
   --radius-sm: 0.75rem;
   --radius: 1rem;

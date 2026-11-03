@@ -1,7 +1,8 @@
 import { TaskServiceError } from './errors';
+import { retrieveRelevantContext, selectCoverageContext } from '../utils/retrieval';
 
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models';
-const MODELS = ['gemini-3.8-flash', 'gemini-3.7-flash'] as const;
+const MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'] as const;
 
 /**
  * The assistant's system instruction: a precise tutor that answers
@@ -19,6 +20,7 @@ export const TUTOR_SYSTEM_INSTRUCTION = [
 
 /** A study note can be long; the prompt is capped so a paste cannot be unbounded. */
 export const MAX_CONTEXT_CHARS = 240_000;
+export const MAX_GENERATION_CONTEXT_CHARS = 16_000;
 
 const KEY_STORAGE_KEY = 'student-tasks:gemini-key';
 
@@ -60,7 +62,7 @@ function truncate(text: string): string {
 export function buildPrompt(documentContext: string, userMessage: string): string {
   const material = truncate(documentContext.trim());
   return material.length > 0
-    ? `Here is my study material: ${material}. Based on this, please answer: ${userMessage}`
+    ? `Materi belajar atau cuplikan relevan:\n${material}\n\nJawab hanya berdasarkan informasi di atas. Jika cuplikan tidak memuat jawabannya, katakan dengan jelas. Pertanyaan: ${userMessage}`
     : userMessage;
 }
 
@@ -127,6 +129,9 @@ export function parseFlashcardPayload(text: string): { question: string; answer:
  * reach a Toast.
  */
 function reasonFrom(status: number, body: string): string {
+  if (status === 503 || status === 502 || status === 504) {
+    return 'Layanan Gemini sedang padat. TaSkill sudah mencoba model cadangan; coba lagi sebentar atau beberapa menit lagi.';
+  }
   try {
     const parsed = JSON.parse(body) as { error?: { message?: string } };
     const message = parsed.error?.message;
@@ -186,7 +191,9 @@ async function callGemini(apiKey: string, request: GeminiRequest, signal?: Abort
     }
 
     if (!response.ok) {
-      lastError = new TaskServiceError(reasonFrom(response.status, await response.text()));
+      const errorText = await response.text();
+      lastError = new TaskServiceError(reasonFrom(response.status, errorText));
+      if (![408, 429, 500, 502, 503, 504].includes(response.status)) throw lastError;
       continue;
     }
 
@@ -224,10 +231,15 @@ export async function askGemini(
   userMessage: string,
   signal?: AbortSignal,
 ): Promise<string> {
+  const retrievedMaterial = retrieveRelevantContext(documentContext, userMessage);
+  const prompt = buildPrompt(retrievedMaterial, userMessage);
+  const boundedPrompt = documentContext.length > MAX_CONTEXT_CHARS
+    ? `[Materi dipotong dan dipilih cuplikan relevannya agar permintaan tetap ringkas.]\n${prompt}`
+    : prompt;
   return callGemini(
     apiKey,
     {
-      prompt: buildPrompt(documentContext, userMessage),
+      prompt: boundedPrompt,
       maxOutputTokens: 1024,
       systemInstruction: TUTOR_SYSTEM_INSTRUCTION,
     },
@@ -279,11 +291,12 @@ export async function generateFlashcards(
   count: number,
   signal?: AbortSignal,
 ): Promise<{ question: string; answer: string }[]> {
+  const generationMaterial = selectCoverageContext(material, MAX_GENERATION_CONTEXT_CHARS);
   const text = await callGemini(
     apiKey,
     {
-      prompt: buildFlashcardPrompt(material, count),
-      maxOutputTokens: 2048,
+      prompt: buildFlashcardPrompt(generationMaterial, count),
+      maxOutputTokens: Math.min(4096, Math.max(1_500, count * 220)),
       responseMimeType: 'application/json',
     },
     signal,
@@ -403,11 +416,12 @@ export async function generateQuiz(
   signal?: AbortSignal,
   focusTopics: string[] = [],
 ): Promise<ParsedQuizQuestion[]> {
+  const generationMaterial = selectCoverageContext(material, MAX_GENERATION_CONTEXT_CHARS);
   const text = await callGemini(
     apiKey,
     {
-      prompt: buildQuizPrompt(material, count, focusTopics),
-      maxOutputTokens: 8192,
+      prompt: buildQuizPrompt(generationMaterial, count, focusTopics),
+      maxOutputTokens: Math.min(6_000, Math.max(2_000, count * 400)),
       responseMimeType: 'application/json',
     },
     signal,

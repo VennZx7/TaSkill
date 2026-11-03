@@ -15,7 +15,7 @@ export type GeneratorSource = 'vault' | 'file' | 'url';
 /** What the material becomes. */
 export type GeneratorTarget = 'quiz' | 'flashcards' | 'both';
 
-const DEFAULT_COUNT: FlashcardCount = 8;
+const DEFAULT_COUNT: FlashcardCount = 5;
 /** A URL is a title of last resort; keep the default deck/set title under the 100-char cap. */
 const URL_TITLE_MAX = 48;
 
@@ -60,7 +60,7 @@ export function useQuizGenerator() {
   const [uploaded, setUploaded] = useState<LoadedDocument | null>(null);
   const [isLoadingSource, setIsLoadingSource] = useState(false);
   const [urlText, setUrlText] = useState('');
-  const [target, setTarget] = useState<GeneratorTarget>('both');
+  const [target, setTarget] = useState<GeneratorTarget>('quiz');
   const [title, setTitle] = useState('');
   const [count, setCount] = useState<FlashcardCount>(DEFAULT_COUNT);
   const [apiKey, setApiKeyState] = useState('');
@@ -117,7 +117,7 @@ export function useQuizGenerator() {
     setMaterialId('');
     setUploaded(null);
     setUrlText('');
-    setTarget('both');
+    setTarget('quiz');
     setTitle('');
     setCount(DEFAULT_COUNT);
     setApiKeyState(storedKey);
