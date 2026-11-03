@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useQuizzes } from '../context/QuizContext';
 import { useUser } from '../context/UserContext';
+import { recordStreakActivity } from '../services/streakService';
 import { QUIZ_XP } from '../services/userService';
 import { recordAttempts } from '../services/attemptService';
 import { TaskServiceError } from '../services/errors';
@@ -105,6 +106,8 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
     );
 
     toast(`Kuis selesai. Skor ${score.correct} dari ${score.total}.`);
+    const streak = recordStreakActivity();
+    if (streak.isNewDay) toast(`Kamu telah menyalakan streak, jumlah streakmu sekarang: ${streak.count} 🔥`);
     const percent = score.total > 0 ? (score.correct / score.total) * 100 : 0;
     if (percent > 75) {
       const result = awardXP(QUIZ_XP);

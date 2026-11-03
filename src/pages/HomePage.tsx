@@ -14,6 +14,7 @@ import { useUser } from '../context/UserContext';
 import { useItems } from '../context/ItemContext';
 import { useViewMode } from '../hooks/useViewMode';
 import { TaskServiceError, ValidationError } from '../services/errors';
+import { recordStreakActivity } from '../services/streakService';
 import { TASK_XP } from '../services/userService';
 import { fireConfetti } from '../utils/confetti';
 import type { Item, ItemDraft, TaskStatus } from '../types/item';
@@ -94,6 +95,8 @@ export function TaskPage() {
       if (next === 'Done') {
         const result = awardXP(TASK_XP);
         toast(`Task Completed! +${TASK_XP} XP 🚀`);
+        const streak = recordStreakActivity();
+        if (streak.isNewDay) toast(`Kamu telah menyalakan streak, jumlah streakmu sekarang: ${streak.count} 🔥`);
         if (result.leveledUp) {
           fireConfetti();
           toast(`Naik ke Level ${result.level} — ${result.title}!`);

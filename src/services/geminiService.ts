@@ -1,7 +1,7 @@
 import { TaskServiceError } from './errors';
 
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models';
-const MODELS = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-2.5-flash'] as const;
+const MODELS = ['gemini-3.8-flash', 'gemini-3.7-flash'] as const;
 
 /**
  * The assistant's system instruction: a precise tutor that answers

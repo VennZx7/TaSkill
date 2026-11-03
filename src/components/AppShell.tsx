@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useUser } from '../context/UserContext';
 import { LevelMeter } from './LevelMeter';
+import { getStreakCount } from '../services/streakService';
 import { BrandMarkIcon } from './ui/icons';
 import styles from './AppShell.module.css';
 
@@ -50,6 +51,9 @@ export function AppShell({ module, onNavigate, actions, children }: AppShellProp
         </nav>
 
         <div className={styles.actions}>
+          <span className={styles.streak} title="Streak harian">
+            🔥 {getStreakCount()}
+          </span>
           <LevelMeter level={level} title={title} progress={progress} variant="compact" />
           {actions}
         </div>

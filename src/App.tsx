@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AppShell, type Module } from './components/AppShell';
+import { Button } from './components/ui/Button';
 import { ThemeToggle } from './components/ui/ThemeToggle';
 import { ToastProvider } from './components/ui/Toast';
 import { FlashcardProvider } from './context/FlashcardContext';
@@ -20,7 +21,7 @@ import { LandingPage } from './pages/landing/LandingPage';
  * No router is installed, and one is not needed: six modules behind one shell,
  * so the current module is local state. The dashboard is the landing view.
  */
-function Workspace() {
+function Workspace({ onExit }: { onExit: () => void }) {
   const [module, setModule] = useState<Module>('dashboard');
   const { theme, toggle } = useTheme();
 
@@ -28,7 +29,14 @@ function Workspace() {
     <AppShell
       module={module}
       onNavigate={setModule}
-      actions={<ThemeToggle theme={theme} onToggle={toggle} />}
+      actions={
+        <>
+          <Button variant="ghost" size="sm" onClick={onExit}>
+            ← Kembali
+          </Button>
+          <ThemeToggle theme={theme} onToggle={toggle} />
+        </>
+      }
     >
         {module === 'dashboard' ? (
           <DashboardPage onNavigate={setModule} />
@@ -61,7 +69,7 @@ export function App() {
             <FlashcardProvider>
               <QuizProvider>
                 <UserProvider>
-                  <Workspace />
+                  <Workspace onExit={() => setEntered(false)} />
                 </UserProvider>
               </QuizProvider>
             </FlashcardProvider>
