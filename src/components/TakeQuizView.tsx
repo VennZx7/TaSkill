@@ -41,10 +41,18 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
   const [selfGrade, setSelfGrade] = useState<Record<string, boolean>>({});
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [retryQuestionIds, setRetryQuestionIds] = useState<string[] | null>(null);
+
+  const activeQuestions = useMemo(
+    () => retryQuestionIds
+      ? quiz.questions.filter((question) => retryQuestionIds.includes(question.id))
+      : quiz.questions,
+    [quiz.questions, retryQuestionIds],
+  );
 
   const choiceQuestions = useMemo(
-    () => quiz.questions.filter((question) => question.kind === 'choice'),
-    [quiz.questions],
+    () => activeQuestions.filter((question) => question.kind === 'choice'),
+    [activeQuestions],
   );
 
   /** Pure derivation of the score — never stored in state. */
@@ -60,7 +68,14 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
   }, [answers, choiceQuestions]);
   const scorePercent = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
   const earnedXp = scorePercent > 75 ? QUIZ_XP : 0;
-  const answeredCount = quiz.questions.filter((question) => (answers[question.id] ?? '').trim().length > 0).length;
+  const answeredCount = activeQuestions.filter((question) => (answers[question.id] ?? '').trim().length > 0).length;
+  const wrongQuestions = submitted
+    ? activeQuestions.filter((question) => {
+        if (question.kind === 'short') return selfGrade[question.id] === false;
+        const chosen = (answers[question.id] ?? '').trim().toLowerCase();
+        return chosen !== question.options[question.correctIndex].trim().toLowerCase();
+      })
+    : [];
 
   const setAnswer = (id: string, value: string) =>
     setAnswers((previous) => ({ ...previous, [id]: value }));
@@ -80,7 +95,7 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
   };
 
   const submit = async () => {
-    const unanswered = quiz.questions.filter(
+    const unanswered = activeQuestions.filter(
       (question) => (answers[question.id] ?? '').trim().length === 0,
     );
     if (unanswered.length > 0) {
@@ -129,9 +144,18 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
   };
 
   const retry = () => {
+    setRetryQuestionIds(null);
     setAnswers({});
     setSelfGrade({});
     setSubmitted(false);
+  };
+
+  const retryWrong = () => {
+    setRetryQuestionIds(wrongQuestions.map((question) => question.id));
+    setAnswers({});
+    setSelfGrade({});
+    setSubmitted(false);
+    toast(`Mulai ulang ${wrongQuestions.length} soal yang tadi salah.`);
   };
 
   return (
@@ -146,7 +170,8 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
           </span>
         </div>
         <div className={styles.headerActions}>
-          <Badge tone="accent">{quiz.questions.length} soal</Badge>
+          {retryQuestionIds ? <Badge tone="warning">Latihan soal salah</Badge> : null}
+          <Badge tone="accent">{activeQuestions.length} soal</Badge>
           <Button variant="ghost" size="sm" onClick={onExit}>
             Kembali ke daftar
           </Button>
@@ -155,10 +180,10 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
 
       {!submitted ? (
         <div className={styles.progressSection}>
-          <div className={styles.progressTrack} role="progressbar" aria-label="Progres kuis" aria-valuemin={0} aria-valuemax={quiz.questions.length} aria-valuenow={answeredCount}>
-            <span style={{ width: `${quiz.questions.length ? (answeredCount / quiz.questions.length) * 100 : 0}%` }} />
+          <div className={styles.progressTrack} role="progressbar" aria-label="Progres kuis" aria-valuemin={0} aria-valuemax={activeQuestions.length} aria-valuenow={answeredCount}>
+            <span style={{ width: `${activeQuestions.length ? (answeredCount / activeQuestions.length) * 100 : 0}%` }} />
           </div>
-          <span className={styles.progressLabel}>{answeredCount}/{quiz.questions.length} soal terjawab</span>
+          <span className={styles.progressLabel}>{answeredCount}/{activeQuestions.length} soal terjawab</span>
         </div>
       ) : null}
 
@@ -200,11 +225,17 @@ export function TakeQuizView({ quiz, onExit }: TakeQuizViewProps) {
             <RefreshIcon size={14} />
             Kerjakan ulang
           </Button>
+          {wrongQuestions.length > 0 ? (
+            <Button variant="primary" size="sm" onClick={retryWrong}>
+              <RefreshIcon size={14} />
+              Ulangi soal yang salah ({wrongQuestions.length})
+            </Button>
+          ) : null}
         </div>
       ) : null}
 
       <ol className={styles.questions}>
-        {quiz.questions.map((question, index) => {
+        {activeQuestions.map((question, index) => {
           const chosen = answers[question.id] ?? '';
           const isChoice = question.kind === 'choice';
           const isCorrect =
